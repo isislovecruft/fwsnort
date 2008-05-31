@@ -1,0 +1,71 @@
+------------------------------------------------------------------------
+r426 | mbr | 2008-01-22 22:35:18 -0500 (Tue, 22 Jan 2008) | 1 line
+Changed paths:
+   A /fwsnort/branches/fwsnort-1.0.4 (from /fwsnort/trunk:425)
+
+created 1.0.4 branch
+------------------------------------------------------------------------
+r425 | mbr | 2008-01-22 22:32:53 -0500 (Tue, 22 Jan 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/ChangeLog
+   M /fwsnort/trunk/VERSION
+   M /fwsnort/trunk/fwsnort
+   M /fwsnort/trunk/packaging/fwsnort.spec
+
+version 1.0.4
+------------------------------------------------------------------------
+r424 | mbr | 2008-01-19 21:36:00 -0500 (Sat, 19 Jan 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/CREDITS
+
+updated with Grant's last name
+------------------------------------------------------------------------
+r422 | mbr | 2008-01-17 23:35:02 -0500 (Thu, 17 Jan 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/VERSION
+   M /fwsnort/trunk/fwsnort
+
+version 1.0.4-pre1
+------------------------------------------------------------------------
+r421 | mbr | 2008-01-17 23:25:55 -0500 (Thu, 17 Jan 2008) | 3 lines
+Changed paths:
+   M /fwsnort/trunk/CREDITS
+   M /fwsnort/trunk/ChangeLog
+   M /fwsnort/trunk/fwsnort
+
+(Grant)  Suggested bugfix to allow negated networks to be specified within
+iptables allow rules or within the fwsnort.conf file.
+
+------------------------------------------------------------------------
+r420 | mbr | 2008-01-17 23:24:19 -0500 (Thu, 17 Jan 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/CREDITS
+
+Added Grant
+------------------------------------------------------------------------
+r419 | mbr | 2008-01-17 22:20:12 -0500 (Thu, 17 Jan 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/IPTables-Parse/lib/IPTables/Parse.pm
+
+(Grant) updated to set sport and dport to 0:0 if protocol == all
+------------------------------------------------------------------------
+r418 | mbr | 2008-01-17 21:57:06 -0500 (Thu, 17 Jan 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/IPTables-Parse/VERSION
+   M /fwsnort/trunk/IPTables-Parse/lib/IPTables/Parse.pm
+
+version 0.5, applied zero protocol fix from Grant, updated to handle ULOG rules
+------------------------------------------------------------------------
+r417 | mbr | 2008-01-14 23:39:14 -0500 (Mon, 14 Jan 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/ChangeLog
+   M /fwsnort/trunk/install.pl
+
+added LC_ALL='C' locale setting, added --Exclude-mod-regex
+------------------------------------------------------------------------
+r416 | mbr | 2008-01-14 23:36:04 -0500 (Mon, 14 Jan 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/snort_rules/bleeding-all.rules
+
+updated to latest (last?) Bleeding Threats signature set
+------------------------------------------------------------------------
