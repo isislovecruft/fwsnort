@@ -1,0 +1,3 @@
+version=3
+
+http://www.cipherdyne.com/fwsnort/download/fwsnort-(.*)\.tar\.gz	debian	uupdate

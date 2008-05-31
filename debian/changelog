@@ -1,0 +1,6 @@
+fwsnort (1.0.4-1) unstable; urgency=low
+
+  * Initial release (Closes: #475822)
+
+ -- Franck Joncourt <franck.mail@dthconnex.com>  Mon, 07 Apr 2008 20:28:16 +0200
+

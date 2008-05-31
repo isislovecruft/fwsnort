@@ -1,0 +1,5 @@
+Template: fwsnort/download
+Type: boolean
+_Description: Download the rules ?
+ The latest Snort rules can be downloaded from http://www.bleedingsnort.com in
+ order to keep fwsnort up-to-date.

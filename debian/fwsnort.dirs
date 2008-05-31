@@ -1,0 +1,3 @@
+etc/fwsnort
+etc/fwsnort/snort_rules
+usr/bin

@@ -1,0 +1,19 @@
+Source: fwsnort
+Section: admin
+Priority: optional
+Maintainer: Franck Joncourt <franck.mail@dthconnex.com>
+Build-Depends: debhelper (>= 5), po-debconf
+Standards-Version: 3.7.3
+
+HomePage: http://www.cipherdyne.org/fwsnort/
+Package: fwsnort
+Architecture: all
+Pre-Depends: debconf (>= 1.5.11)
+Depends: ${perl:Depends}, iptables, libnetwork-ipv4addr-perl, libiptables-parse-perl
+Description: Firewall Snort 
+ Fwsnort translates Snort rules into iptables rule approximations and generates
+ a Bourne shell script that implements the resulting iptables commands.
+ .
+ This ruleset allows network  traffic  that  exhibits  Snort signatures to be 
+ logged and/or dropped by iptables directly without putting any interface into
+ promiscuous mode or  queuing  packets  from kernel  to  user  space.
