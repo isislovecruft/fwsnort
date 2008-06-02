@@ -43,11 +43,10 @@ binary-indep: build install
 	dh_installchangelogs ChangeLog
 	dh_installdocs
 	dh_installman
-	dh_strip
+	dh_perl
 	dh_compress
 	dh_fixperms
 	dh_installdeb
-	dh_perl
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
