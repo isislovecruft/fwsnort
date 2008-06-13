@@ -1,16 +1,16 @@
 Source: fwsnort
 Section: admin
 Priority: optional
-Build-Depends: debhelper (>= 5), po-debconf
+Build-Depends: debhelper (>= 5)
+Build-Depends-Indep: po-debconf
 Maintainer: Franck Joncourt <franck.mail@dthconnex.com>
-Standards-Version: 3.7.3
+Standards-Version: 3.8.0
 Homepage: http://www.cipherdyne.org/fwsnort/
 Vcs-Svn: svn://svn.stones.lan/fwsnort/trunk/
 Vcs-Browser: http://svn.stones.lan/wsvn/fwsnort/trunk/
 
 Package: fwsnort
 Architecture: all
-Pre-Depends: debconf (>= 1.5.11)
 Depends: ${perl:Depends}, ${misc:Depends}, iptables, libnetwork-ipv4addr-perl, libiptables-parse-perl
 Description: Firewall Snort 
  Fwsnort translates Snort rules into iptables rule approximations and generates
