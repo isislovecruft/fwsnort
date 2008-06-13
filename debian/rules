@@ -8,7 +8,7 @@ INSTALL_DATA    = $(INSTALL) -m 644
 
 PROGRAM		= $(shell dh_listpackages)
 DESTDIR		= $(CURDIR)/debian/$(PROGRAM)/
-DESTDIR_BIN	= $(CURDIR)/debian/$(PROGRAM)/usr/bin/
+DESTDIR_BIN	= $(CURDIR)/debian/$(PROGRAM)/usr/sbin/
 DESTDIR_ETC	= $(CURDIR)/debian/$(PROGRAM)/etc/$(PROGRAM)/
 
 clean:
