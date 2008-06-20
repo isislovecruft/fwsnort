@@ -6,8 +6,6 @@ Build-Depends-Indep: po-debconf
 Maintainer: Franck Joncourt <franck.mail@dthconnex.com>
 Standards-Version: 3.8.0
 Homepage: http://www.cipherdyne.org/fwsnort/
-Vcs-Svn: svn://svn.stones.lan/fwsnort/trunk/
-Vcs-Browser: http://svn.stones.lan/wsvn/fwsnort/trunk/
 
 Package: fwsnort
 Architecture: all
