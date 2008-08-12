@@ -1,7 +1,13 @@
-fwsnort (1.0.4-1) unstable; urgency=low
+fwsnort (1.0.5-pre1-1) UNRELEASED; urgency=low
 
   * TODO
-      + Add copyright for the other rules.      
+      + Add copyright for the snort rules ? 
+
+  * New Upstream Version
+  
+ -- Franck Joncourt <franck.mail@dthconnex.com>  Tue, 12 Aug 2008 17:19:28 +0200
+
+fwsnort (1.0.4-1) unstable; urgency=low    
 
   * Initial release (Closes: #475822)
 
