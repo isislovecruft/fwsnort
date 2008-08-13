@@ -10,6 +10,7 @@ Homepage: http://www.cipherdyne.org/fwsnort/
 Package: fwsnort
 Architecture: all
 Depends: ${perl:Depends}, ${misc:Depends}, iptables, libnetwork-ipv4addr-perl, libiptables-parse-perl
+Recommends: snort-rules-default
 Description: Firewall Snort 
  Fwsnort translates Snort rules into iptables rule approximations and generates
  a Bourne shell script that implements the resulting iptables commands.
