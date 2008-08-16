@@ -14,7 +14,7 @@
 #
 # Credits: (see the CREDITS file)
 #
-# Version: 1.0.5-pre2
+# Version: 1.0.5-pre4
 #
 # Copyright (C) 2003-2007 Michael Rash (mbr@cipherdyne.org)
 #
@@ -85,15 +85,14 @@
 #
 ############################################################################
 #
-# $Id: fwsnort 451 2008-08-13 04:17:22Z mbr $
+# $Id: fwsnort 466 2008-08-16 04:49:50Z mbr $
 #
 
-use lib '/usr/lib/fwsnort';
-use Data::Dumper;
 use IO::Socket;
 use File::Copy;
 use File::Path;
 use Sys::Hostname;
+use Data::Dumper;
 use Getopt::Long;
 use strict;
 
@@ -115,8 +114,8 @@ my $ipt_script = "${fwsnort_dir}/fwsnort.sh";
 #===================== end config =======================
 
 ### version number
-my $version = '1.0.5-pre2';
-my $revision_svn = '$Revision: 451 $';
+my $version = '1.0.5-pre4';
+my $revision_svn = '$Revision: 466 $';
 my $rev_num = '1';
 ($rev_num) = $revision_svn =~ m|\$Rev.*:\s+(\S+)|;
 
@@ -255,24 +254,24 @@ my %snort_opts = (
         ### Netfilter u32 module.  Functionality has been built
         ### into psad to generate alerts for most of these Snort
         ### options.
-        'id'       => '[\s;]id:\s*(\d+)\s*;',
-        'seq'      => '[\s;]seq:\s*(\d+)\s*;',  ### --log-tcp-sequence
-        'ack'      => '[\s;]ack:\s*.*?\s*;',    ### --log-tcp-sequence
-        'icmp_seq' => '[\s;]icmp_seq:\s*(\d+)\s*;',
-        'icmp_id'  => '[\s;]icmp_id:\s*(\d+)\s*;',
-        'sameip'   => '[\s;]sameip\s*;',
-        'regex'    => '[\s;]regex:\s*(.*?)\s*;',
-        'isdataat' => '[\s;]isdataat:\s*(.*?)\s*;',
+        'id'        => '[\s;]id:\s*(\d+)\s*;',
+        'seq'       => '[\s;]seq:\s*(\d+)\s*;',  ### --log-tcp-sequence
+        'ack'       => '[\s;]ack:\s*.*?\s*;',    ### --log-tcp-sequence
+        'icmp_seq'  => '[\s;]icmp_seq:\s*(\d+)\s*;',
+        'icmp_id'   => '[\s;]icmp_id:\s*(\d+)\s*;',
+        'sameip'    => '[\s;]sameip\s*;',
+        'regex'     => '[\s;]regex:\s*(.*?)\s*;',
+        'isdataat'  => '[\s;]isdataat:\s*(.*?)\s*;',
+        'threshold' => '[\s;]threshold:\s*.*?\s*;'  ### FIXME --limit
     },
 
     ### snort options that fwsnort will ignore
     'ignore' => {
-        'nocase'    => '[\s;]nocase\s*;',
-        'logto'     => '[\s;]logto:\s*\S+\s*;',
-        'session'   => '[\s;]session\s*;',
-        'tag'       => '[\s;]tag:\s*.*?\s*;',
-        'threshold' => '[\s;]threshold:\s*.*?\s*;',
-        'react'     => '[\s;]react:\s*.*?\s*;' ### FIXME -j REJECT
+        'nocase'  => '[\s;]nocase\s*;',
+        'logto'   => '[\s;]logto:\s*\S+\s*;',
+        'session' => '[\s;]session\s*;',
+        'tag'     => '[\s;]tag:\s*.*?\s*;',
+        'react'   => '[\s;]react:\s*.*?\s*;' ### FIXME -j REJECT
     }
 );
 
@@ -592,9 +591,16 @@ exit 0;
 #===================== end main ======================
 
 sub parse_snort_rules() {
-    opendir D, $rules_dir or die "[*] Could not open $rules_dir";
-    my @rfiles = readdir D;
-    closedir D;
+
+    my @rfiles = ();
+
+    for my $dir (split /\,/, $rules_dir) {
+        opendir D, $dir or die "[*] Could not opendir $dir";
+        for my $file (readdir D) {
+            push @rfiles, "$dir/$file";
+        }
+        closedir D;
+    }
 
     my $abs_num  = 0;
     my $sabs_num = 0;
@@ -602,7 +608,11 @@ sub parse_snort_rules() {
     my $tot_unsup_ctr = 0;
     FILE: for my $rfile (sort @rfiles) {
         my $type = '';
-        if ($rfile =~ /(\S+)\.rules$/) {
+        my $filename = '';
+        if ($rfile =~ m|.*/(\S+\.rules)$|) {
+            $filename = $1;
+        }
+        if ($rfile =~ m|.*/(\S+)\.rules$|) {
             $type = $1;
         } else {
             next FILE;
@@ -617,12 +627,11 @@ sub parse_snort_rules() {
         if ($rfile eq 'deleted.rules') {
             next FILE unless $add_deleted;
         }
-        ($snort_type) = ($rfile =~ /(\S+)\.rules/);
-        printf("%-30s", "[+] $rfile") unless $include_sids;
+        ($snort_type) = ($rfile =~ m|.*/(\S+)\.rules|);
+        printf("%-30s", "[+] $filename") unless $include_sids;
 
         &logr("[+] Parsing $rfile");
-        open R, "< ${rules_dir}/${rfile}" or die "[*] Could not ",
-            "open: ${rules_dir}/${rfile}";
+        open R, "< $rfile" or die "[*] Could not open: $rfile";
         my @lines = <R>;
         close R;
 
@@ -683,7 +692,7 @@ sub parse_snort_rules() {
             ### skip all icmp "Undefined Code" rules; psad properly
             ### handles this, but not fwsnort (see the icmp-info.rules
             ### file).
-            if ($rfile =~ /icmp/ and $rule_options =~ /undefined\s+code/i) {
+            if ($filename =~ /icmp/ and $rule_options =~ /undefined\s+code/i) {
                 $unsup_ctr++;
                 $tot_unsup_ctr++;
                 next RULE;
@@ -709,7 +718,7 @@ sub parse_snort_rules() {
                 next RULE;
             }
             if ($include_sids) {
-                print "[+] Found sid: $opts_href->{'sid'} in $rfile\n";
+                print "[+] Found sid: $opts_href->{'sid'} in $filename\n";
             }
 
             if ($queue_mode or $nfqueue_mode) {
@@ -777,8 +786,8 @@ sub parse_snort_rules() {
         }
 
         if (($queue_mode or $nfqueue_mode) and @queue_rules) {
-            open M, "> $queue_rules_dir/$rfile" or die "[*] Could not ",
-                "open $queue_rules_dir/$rfile: $!";
+            open M, "> $queue_rules_dir/$filename" or die "[*] Could not ",
+                "open $queue_rules_dir/$filename: $!";
             print M "#\n### This file generated with: fwsnort @argv_cp\n#\n\n";
             print M "$_\n", for @queue_rules;
             print M "\n### EOF ###\n";
@@ -2417,38 +2426,30 @@ sub ipt_type() {
 }
 
 sub check_type() {
-    for my $type (keys %include_types) {
-        unless (-e "${rules_dir}/${type}.rules") {
-            print "[-] \"$type\" is not a valid include type.\n",
-                "    Choose from the following available signature types:\n";
-            opendir D, $rules_dir or die "[*] Could not open $rules_dir";
-            my @rfiles = readdir D;
-            closedir D;
-
-            for my $file (sort @rfiles) {
-                if ($file =~ /^(\S+)\.rules/) {
-                    print "        $1\n";
+    for my $type_hr (\%include_types, \%exclude_types) {
+        for my $type (keys %$type_hr) {
+            my $found = 0;
+            my @valid_types = ();
+            for my $dir (split /\,/, $rules_dir) {
+                if (-e "$dir/${type}.rules") {
+                    $found = 1;
+                } else {
+                    opendir D, $dir or die "[*] Could not open $dir: $!";
+                    for my $file (readdir D) {
+                        if ($file =~ /(\S+)\.rules/) {
+                            push @valid_types, $1;
+                        }
+                    }
                 }
             }
-            print "[-] Exiting.\n";
-            exit 1;
-        }
-    }
-    for my $type (keys %exclude_types) {
-        unless (-e "${rules_dir}/${type}.rules") {
-            print "[-] \"$type\" is not a valid exclude type.\n",
+            unless ($found) {
+                print "[-] \"$type\" is not a valid type.\n",
                 "    Choose from the following available signature types:\n";
-            opendir D, $rules_dir or die "[*] Could not open $rules_dir";
-            my @rfiles = readdir D;
-            closedir D;
-
-            for my $file (sort @rfiles) {
-                if ($file =~ /^(\S+)\.rules/) {
-                    print "        $1\n";
+                for my $type (sort @valid_types) {
+                    print "        $type\n";
                 }
+                die "[-] Exiting.";
             }
-            print "[-] Exiting.\n";
-            exit 1;
         }
     }
     return;
@@ -2978,11 +2979,11 @@ sub import_perl_modules() {
     }
 
     if ($debug) {
-        print STDERR "[+] import_perl_modules(): The \@INC array:\n";
-        print STDERR "$_\n" for @INC;
+        print "[+] import_perl_modules(): The \@INC array:\n";
+        print "$_\n" for @INC;
     }
 
-    require IPTables::ChainMgr;
+    require IPTables::Parse;
     require Net::IPv4Addr;
 
     Net::IPv4Addr->import(qw/ipv4_in_network/);
@@ -3028,8 +3029,11 @@ sub setup() {
     ### things to work
     die "[*] No fwsnort directory $fwsnort_dir"
         unless -d $fwsnort_dir;
-    die "[*] No snort rules directory $rules_dir, use --snort-rdir"
-        unless -d $rules_dir;
+
+    for my $dir (split /\,/, $rules_dir) {
+        die "[*] No snort rules directory $dir, use --snort-rdir"
+            unless -d $dir;
+    }
 
     ### import psad perl modules
     &import_perl_modules();
@@ -3052,7 +3056,9 @@ sub setup() {
 sub update_rules() {
     my $url = 'http://www.emergingthreats.net/rules/emerging-all.rules';
     print "[+] Downloading latest rules:\n    $url\n";
-    chdir $rules_dir or die "[*] Could not chdir $rules_dir: $!";
+    my $dir = $rules_dir;
+    $dir =~ s/\,.*//;
+    chdir $dir or die "[*] Could not chdir $dir: $!";
     if (-e 'emerging-all.rules') {
         move 'emerging-all.rules', 'emerging-all.rules.tmp'
             or die "[*] Could not move emerging-all.rules -> ",
@@ -3227,6 +3233,8 @@ Options:
     --snort-conf=<file>       - Read Snort specific variables out of
                                 existing snort.conf file.
     --snort-rdir=<dir>        - Specify path to Snort rules directory.
+                                This can be a list of directories separated
+                                by commas.
     --no-ipt-comments         - Do not add Snort "msg" fields to iptables
                                 rules with the iptables comment match.
     --no-ipt-sync             - Add iptables rules for signatures that
