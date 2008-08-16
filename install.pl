@@ -25,7 +25,7 @@
 #
 #######################################################################
 #
-# $Id: install.pl 417 2008-01-15 04:39:14Z mbr $
+# $Id: install.pl 455 2008-08-15 01:15:30Z mbr $
 #
 
 use Cwd;
@@ -41,8 +41,7 @@ my $lib_dir     = '/usr/lib/fwsnort';
 my $fwsnort_dir = '/etc/fwsnort';
 my $rules_dir   = "${fwsnort_dir}/snort_rules";
 
-### Snort.org no longer allows auto downloads of signatures
-my $bleeding_snort_website = 'www.bleedingsnort.com';
+my $update_website = 'www.emergingthreats.net';
 
 ### system binaries
 my $perlCmd = '/usr/bin/perl';
@@ -66,9 +65,11 @@ my %required_perl_modules = (
 
 ### establish some defaults
 my $uninstall = 0;
+my $skip_module_install   = 0;
 my $cmdline_force_install = 0;
 my $force_mod_re = '';
 my $exclude_mod_re = '';
+my $deps_dir = 'deps';
 my $help = 0;
 my $locale = 'C';  ### default LC_ALL env variable
 my $no_locale = 0;
@@ -90,6 +91,7 @@ Getopt::Long::Configure('no_ignore_case');
     'force-mod-install' => \$cmdline_force_install,  ### force install of all modules
     'Force-mod-regex=s' => \$force_mod_re, ### force specific mod install with regex
     'Exclude-mod-regex=s' => \$exclude_mod_re, ### exclude a particular perl module
+    'Skip-mod-install'  => \$skip_module_install,
     'uninstall' => \$uninstall, ### uninstall fwsnort
     'LC_ALL=s'  => \$locale,
     'no-LC_ALL' => \$no_locale,
@@ -103,6 +105,10 @@ $ENV{'LC_ALL'} = $locale unless $no_locale;
 
 $force_mod_re = qr|$force_mod_re| if $force_mod_re;
 $exclude_mod_re = qr|$exclude_mod_re| if $exclude_mod_re;
+
+### see if the deps/ directory exists, and if not then we are installing
+### from the -nodeps sources so don't install any perl modules
+$skip_module_install = 1 unless -d $deps_dir;
 
 ### make sure the system binaries are where we think they are.
 &check_commands();
@@ -133,45 +139,51 @@ sub install() {
     }
 
     ### install perl modules
-    for my $module (keys %required_perl_modules) {
-        &install_perl_module($module);
-    }
-
-    my $local_rules_dir = 'snort_rules';
-    if (&query_get_bleeding_snort()) {
-        chdir $local_rules_dir or die "[*] Could not chdir $local_rules_dir";
-        if (-e 'bleeding-all.rules') {
-            move 'bleeding-all.rules', 'bleeding-all.rules.tmp'
-                or die "[*] Could not move bleeding-all.rules -> ",
-                "bleeding-all.rules.tmp";
+    unless ($skip_module_install) {
+        for my $module (keys %required_perl_modules) {
+            &install_perl_module($module);
         }
-        system "$cmds{'wget'} http://$bleeding_snort_website/bleeding-all.rules";
-        if (-e 'bleeding-all.rules') {  ### successful download
-            unlink 'bleeding-all.rules.tmp';
+    }
+    chdir $src_dir or die "[*] Could not chdir $src_dir: $!";
+
+    my $local_rules_dir = 'deps/snort_rules';
+    if (-d 'deps' and -d $local_rules_dir
+            and &query_get_emerging_threats_sigs()) {
+        chdir $local_rules_dir or die "[*] Could not chdir $local_rules_dir";
+        if (-e 'emerging-all.rules') {
+            move 'emerging-all.rules', 'emerging-all.rules.tmp'
+                or die "[*] Could not move emerging-all.rules -> ",
+                "emerging-all.rules.tmp";
+        }
+        system "$cmds{'wget'} http://$update_website/rules/emerging-all.rules";
+        if (-e 'emerging-all.rules') {  ### successful download
+            unlink 'emerging-all.rules.tmp';
         } else {
-            print "[-] Could not download bleeding-all.rules file.\n";
-            if (-e 'bleeding-all.rules.tmp') {
+            print "[-] Could not download emerging-all.rules file.\n";
+            if (-e 'emerging-all.rules.tmp') {
                 ### move the original back
-                move 'bleeding-all.rules', 'bleeding-all.rules.tmp'
-                    or die "[*] Could not move bleeding-all.rules -> ",
-                    "bleeding-all.rules.tmp";
+                move 'emerging-all.rules', 'emerging-all.rules.tmp'
+                    or die "[*] Could not move emerging-all.rules -> ",
+                    "emerging-all.rules.tmp";
             }
         }
-        chdir '..';
+        chdir '../..';
     }
 
-    opendir D, $local_rules_dir or die "[*] Could not open ",
-        "the $local_rules_dir directory: $!";
-    my @rfiles = readdir D;
-    closedir D;
+    if (-d 'deps' and -d $local_rules_dir) {
+        opendir D, $local_rules_dir or die "[*] Could not open ",
+            "the $local_rules_dir directory: $!";
+        my @rfiles = readdir D;
+        closedir D;
 
-    print "[+] Copying all rules files to $rules_dir\n";
-    for my $rfile (@rfiles) {
-        next unless $rfile =~ /\.rules$/;
-        print "[+] Installing $rfile\n";
-        copy "snort_rules/${rfile}", "${rules_dir}/${rfile}" or
-            die "[*] Could not copy snort_rules/${rfile} ",
-                "-> ${rules_dir}/${rfile}";
+        print "[+] Copying all rules files to $rules_dir\n";
+        for my $rfile (@rfiles) {
+            next unless $rfile =~ /\.rules$/;
+            print "[+] Installing $rfile\n";
+            copy "$local_rules_dir/${rfile}", "${rules_dir}/${rfile}" or
+                die "[*] Could not copy $local_rules_dir/${rfile} ",
+                    "-> ${rules_dir}/${rfile}";
+        }
     }
 
     print "\n";
@@ -206,6 +218,9 @@ sub install() {
 
 sub install_perl_module() {
     my $mod_name = shift;
+
+    chdir $src_dir or die "[*] Could not chdir $src_dir: $!";
+    chdir $deps_dir or die "[*] Could not chdir($deps_dir): $!";
 
     die '[*] Missing force-install key in required_perl_modules hash.'
         unless defined $required_perl_modules{$mod_name}{'force-install'};
@@ -272,10 +287,10 @@ sub install_perl_module() {
         system $cmds{'make'};
 #        system "$cmds{'make'} test";
         system "$cmds{'make'} install";
-        chdir $src_dir or die "[*] Could not chdir $src_dir: $!";
 
         print "\n\n";
     }
+    chdir $src_dir or die "[*] Could not chdir $src_dir: $!";
     return;
 }
 
@@ -357,10 +372,10 @@ sub install_manpage() {
     return;
 }
 
-sub query_get_bleeding_snort() {
+sub query_get_emerging_threats_sigs() {
     my $ans = '';
     print "[+] Would you like to download the latest Snort rules from \n",
-        "    http://$bleeding_snort_website/?\n";
+        "    http://$update_website/?\n";
     while ($ans ne 'y' && $ans ne 'n') {
         print "    ([y]/n)?  ";
         $ans = <STDIN>;
