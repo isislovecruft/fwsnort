@@ -8,7 +8,7 @@ INSTALL_DATA    = $(INSTALL) -m 644
 
 PROGRAM		= $(shell dh_listpackages)
 DESTDIR		= $(CURDIR)/debian/$(PROGRAM)/
-DESTDIR_BIN	= $(CURDIR)/debian/$(PROGRAM)/usr/sbin/
+DESTDIR_SBIN	= $(CURDIR)/debian/$(PROGRAM)/usr/sbin/
 DESTDIR_ETC	= $(CURDIR)/debian/$(PROGRAM)/etc/$(PROGRAM)/
 
 clean:
@@ -28,11 +28,9 @@ install-stamp:
 	dh_clean -k
 	dh_installdirs
 
-	$(INSTALL_DATA) snort_rules/*.rules $(DESTDIR_ETC)snort_rules
-	
 	$(INSTALL_DATA) fwsnort.conf $(DESTDIR_ETC)
 
-	$(INSTALL_PROGRAM) $(PROGRAM) $(DESTDIR_BIN)
+	$(INSTALL_PROGRAM) $(PROGRAM) $(DESTDIR_SBIN)
 
 	touch $@
 	
