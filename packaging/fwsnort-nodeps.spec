@@ -3,10 +3,6 @@
 %define release 1
 %define fwsnortlogdir /var/log/fwsnort
 
-### get the first @INC directory that includes the string "linux".
-### This may be 'i386-linux', or 'i686-linux-thread-multi', etc.
-%define fwsnortmoddir `perl -e '$path='i386-linux'; for (@INC) { if($_ =~ m|.*/(.*linux.*)|) {$path = $1; last; }} print $path'`
-
 Summary: Fwsnort translates Snort rules into equivalent Netfilter rules
 Name: %name
 Version: %version
@@ -42,7 +38,7 @@ of all rules from the Snort-2.3.3 IDS into equivalent iptables rules. For
 more information about the translation strat- egy as well as
 advantages/disadvantages of the method used by fwsnort to obtain intrusion
 detection data, see the README included with the fwsnort sources or browse
-to: http://www.cipherdyne.org/projects/fwsnort/.
+to: http://www.cipherdyne.org/fwsnort/
 
 %prep
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
@@ -50,9 +46,6 @@ to: http://www.cipherdyne.org/projects/fwsnort/.
 %setup -q
 
 %build
-### build perl modules used by fwsnort
-make OPTS="$RPM_OPT_FLAGS" -C IPTables-Parse
-make OPTS="$RPM_OPT_FLAGS" -C Net-IPv4Addr
 
 %install
 ### config directory
@@ -91,11 +84,11 @@ install -m 644 fwsnort.8 $RPM_BUILD_ROOT%{_mandir}/man8/
 %config(noreplace) %_sysconfdir/%name/fwsnort.conf
 
 %changelog
-* Thu Aug 07 2008 Michael Rash <mbr@cipherydne.org>
+* Thu Aug 17 2008 Michael Rash <mbr@cipherydne.org>
 - Updated to use the deps/ directory for all perl module sources.
 - fwsnort-1.0.5 release
 
-* Tue Jan 22 2007 Michael Rash <mbr@cipherydne.org>
+* Tue Jan 22 2008 Michael Rash <mbr@cipherydne.org>
 - fwsnort-1.0.4 release
 
 * Thu Nov 22 2007 Michael Rash <mbr@cipherydne.org>

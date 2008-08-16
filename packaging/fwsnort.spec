@@ -43,17 +43,12 @@ of all rules from the Snort-2.3.3 IDS into equivalent iptables rules. For
 more information about the translation strat- egy as well as
 advantages/disadvantages of the method used by fwsnort to obtain intrusion
 detection data, see the README included with the fwsnort sources or browse
-to: http://www.cipherdyne.org/projects/fwsnort/.
+to: http://www.cipherdyne.org/fwsnort/
 
 %prep
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
 %setup -q
-
-for i in $(grep -r "use lib" . | cut -d: -f1); do
-	awk '/use lib/ { sub("/usr/lib/fwsnort", "%_libdir/%name") } { print }' $i > $i.tmp
-	mv $i.tmp $i
-done
 
 cd deps
 cd IPTables-Parse && perl Makefile.PL PREFIX=%fwsnortlibdir LIB=%fwsnortlibdir
@@ -127,11 +122,11 @@ cp -r deps/snort_rules $RPM_BUILD_ROOT%_sysconfdir/%name
 %_libdir/%name
 
 %changelog
-* Thu Aug 07 2008 Michael Rash <mbr@cipherydne.org>
+* Thu Aug 17 2008 Michael Rash <mbr@cipherydne.org>
 - Updated to use the deps/ directory for all perl module sources.
 - fwsnort-1.0.5 release
 
-* Tue Jan 22 2007 Michael Rash <mbr@cipherydne.org>
+* Tue Jan 22 2008 Michael Rash <mbr@cipherydne.org>
 - fwsnort-1.0.4 release
 
 * Thu Nov 22 2007 Michael Rash <mbr@cipherydne.org>
