@@ -5,20 +5,7 @@
 
 # Check their answer
 db_get fwsnort/download
-if [ "$RET" = "true" ]; then
-	
-	cd /etc/fwsnort/snort_rules/
-	mv bleeding-all.rules bleeding-all.rules.tmp
-
-	wget http://www.bleedingsnort.com/bleeding-all.rules
-
-	if [ $? = 0 ]; then
-		rm bleeding-all.rules.tmp
-	else
-		mv bleeding-all.rules.tmp bledding-all.rules
-	fi
-
-fi
+[ "$RET" = "true" ] && fwsnort --update-rules
 
 #DEBHELPER#
 

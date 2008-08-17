@@ -1,5 +1,30 @@
 #!/bin/sh
 
+set -e
+
+# In case the user wants to purge the fwsnort package, we must manually remove
+# some files.
+if [ "$1"  = "purge" ]; then
+
+	# By default fwsnort logs all parse errors to /var/log/fwsnort.log
+	[ -f /var/log/fwsnort.log ] && rm /var/log/fwsnort.log
+
+	# Every time fwsnort is used to generated an iptables script, if an old
+	# script is found, the previous one is moved to the archives directory.
+	# Therefore, we have to make sure we remove this directory and the default
+	# script fwsnort.sh.
+	[ -f /etc/fwsnort/fwsnort.sh ] && rm /etc/fwsnort/fwsnort.sh
+	if [ -d /etc/fwsnort/archive ]; then
+		find /etc/fwsnort/archive/ -type f -exec rm {} \;
+		rmdir /etc/fwsnort/archive
+	fi
+
+	# We take care of the default directory where the user can store his rules.
+	if [ -d /etc/fwsnort/snort_rules ]; then
+		find /etc/fwsnort/snort_rules/ -type f -exec rm {} \;
+	fi
+
+fi
 #DEBHELPER#
 
 exit 0
