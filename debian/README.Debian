@@ -1,0 +1,25 @@
+Snort rules
+------------------------------------------------------------------------------
+
+The Debian package of fwsnort does not contain any ruleset.
+
+You can however get the latest emerging threats rules from their website
+(http://www.emergingthreats.net) by running one of the following commands:
+
+[code]
+fwsnort --update-rules
+dpkg-reconfigure fwsnort
+[/code]
+
+The new ruleset will be saved in /etc/fwsnort/snort_rules.
+
+The snort-rules-default package is recommended and can provide you with more
+rules that you can then manage by oinkmaster.
+
+To work with two directories, you can run:
+
+[code]
+fwsnort --snort-rdir /etc/snort/rules,/etc/fwsnort/snort_rules
+[/code]
+
+You can add as many directories as you want as a comma separated list.
