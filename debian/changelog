@@ -1,3 +1,9 @@
+fwsnort (1.0.5-pre4-2) unstable; urgency=low
+
+  * Removed copyright from the old bleeding ruleset.
+
+ -- Franck Joncourt <franck.mail@dthconnex.com>  Sun, 17 Aug 2008 16:23:54 +0200
+
 fwsnort (1.0.5-pre4-1) unstable; urgency=low
 
   * New Upstream Version
