@@ -1,0 +1,278 @@
+------------------------------------------------------------------------
+r473 | mbr | 2008-08-21 20:24:54 -0400 (Thu, 21 Aug 2008) | 1 line
+Changed paths:
+   A /fwsnort/branches/fwsnort-1.0.5 (from /fwsnort/trunk:472)
+
+created fwsnort-1.0.5 branch
+------------------------------------------------------------------------
+r472 | mbr | 2008-08-21 20:22:28 -0400 (Thu, 21 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/VERSION
+   M /fwsnort/trunk/fwsnort
+
+version 1.0.5
+------------------------------------------------------------------------
+r471 | mbr | 2008-08-21 20:20:48 -0400 (Thu, 21 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/packaging/fwsnort-nodeps.spec
+   M /fwsnort/trunk/packaging/fwsnort.spec
+
+updated release date
+------------------------------------------------------------------------
+r470 | mbr | 2008-08-21 20:20:36 -0400 (Thu, 21 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/packaging/cd_rpmbuilder
+
+Added support for nodeps RPM's
+------------------------------------------------------------------------
+r469 | mbr | 2008-08-16 10:11:19 -0400 (Sat, 16 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/TODO
+
+added download of Emerging Threats as a tarball (suggested by Franck Joncourt)
+------------------------------------------------------------------------
+r468 | mbr | 2008-08-16 01:10:13 -0400 (Sat, 16 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/fwsnort.8
+   M /fwsnort/trunk/packaging/fwsnort-nodeps.spec
+   M /fwsnort/trunk/packaging/fwsnort.spec
+
+minor dodumentation fixes
+------------------------------------------------------------------------
+r466 | mbr | 2008-08-16 00:49:50 -0400 (Sat, 16 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/VERSION
+   M /fwsnort/trunk/fwsnort
+
+bumped version to 1.0.5-pre4
+------------------------------------------------------------------------
+r465 | mbr | 2008-08-16 00:47:59 -0400 (Sat, 16 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/ChangeLog
+   M /fwsnort/trunk/fwsnort
+
+moved 'threshold' to the unsupported list since there will be several signatures that use this feature to detect the Dan Kaminsky DNS attack
+------------------------------------------------------------------------
+r464 | mbr | 2008-08-16 00:28:36 -0400 (Sat, 16 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/packaging/fwsnort-nodeps.spec
+   M /fwsnort/trunk/packaging/fwsnort.spec
+
+updated 1.0.5 release date, removed perl module path updating code
+------------------------------------------------------------------------
+r463 | mbr | 2008-08-16 00:17:43 -0400 (Sat, 16 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/fwsnort
+
+bugfix for IPTables::ChainMgr -> IPTables::Parse
+------------------------------------------------------------------------
+r461 | mbr | 2008-08-15 21:13:14 -0400 (Fri, 15 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/VERSION
+   M /fwsnort/trunk/fwsnort
+
+bumped version to 1.0.5-pre3
+------------------------------------------------------------------------
+r460 | mbr | 2008-08-15 00:41:17 -0400 (Fri, 15 Aug 2008) | 1 line
+Changed paths:
+   A /fwsnort/trunk/bump_version.pl
+
+added bump_version.pl file
+------------------------------------------------------------------------
+r459 | mbr | 2008-08-15 00:40:55 -0400 (Fri, 15 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/fwsnort
+
+bugfix to exclude all directories except for the first in --update mode if multiple directories are given as a comma-separated list
+------------------------------------------------------------------------
+r458 | mbr | 2008-08-15 00:35:05 -0400 (Fri, 15 Aug 2008) | 3 lines
+Changed paths:
+   M /fwsnort/trunk/ChangeLog
+   M /fwsnort/trunk/fwsnort
+   M /fwsnort/trunk/fwsnort.8
+
+Added support for multiple Snort rule directories as a comma-separated
+list for the argument to --snort-rdir.
+
+------------------------------------------------------------------------
+r457 | mbr | 2008-08-14 22:36:07 -0400 (Thu, 14 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/fwsnort
+
+removed old 'use lib' call since fwsnort uses the 'require' strategy now
+------------------------------------------------------------------------
+r456 | mbr | 2008-08-14 21:20:27 -0400 (Thu, 14 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/fwsnort.8
+
+applied patch from Franck Joncourt to fix fwsnort man page to replace bleeding-all with emerging-all
+------------------------------------------------------------------------
+r455 | mbr | 2008-08-14 21:15:30 -0400 (Thu, 14 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/install.pl
+
+minor update to make sure to always return to the source directory when installing perl modules
+------------------------------------------------------------------------
+r454 | mbr | 2008-08-14 21:14:31 -0400 (Thu, 14 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/packaging/fwsnort.spec
+
+minor fwsnort URL fix
+------------------------------------------------------------------------
+r453 | mbr | 2008-08-14 21:14:22 -0400 (Thu, 14 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/packaging/fwsnort-nodeps.spec
+
+removed moddir, minor fwsnort URL fix
+------------------------------------------------------------------------
+r451 | mbr | 2008-08-13 00:17:22 -0400 (Wed, 13 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/VERSION
+   M /fwsnort/trunk/fwsnort
+
+version to 1.0.5-pre2
+------------------------------------------------------------------------
+r450 | mbr | 2008-08-13 00:15:32 -0400 (Wed, 13 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/packaging/fwsnort-nodeps.spec
+   M /fwsnort/trunk/packaging/fwsnort.spec
+
+updated to handle snort_rules/ directory move to deps/
+------------------------------------------------------------------------
+r449 | mbr | 2008-08-13 00:14:30 -0400 (Wed, 13 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/ChangeLog
+
+added -nodeps patch from Franck
+------------------------------------------------------------------------
+r448 | mbr | 2008-08-13 00:14:15 -0400 (Wed, 13 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/fwsnort.8
+
+added --snort-rdir patch from Franck
+------------------------------------------------------------------------
+r447 | mbr | 2008-08-13 00:09:44 -0400 (Wed, 13 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/CREDITS
+   M /fwsnort/trunk/ChangeLog
+   A /fwsnort/trunk/deps/snort_rules (from /fwsnort/trunk/snort_rules:446)
+   M /fwsnort/trunk/fwsnort
+   M /fwsnort/trunk/install.pl
+   D /fwsnort/trunk/snort_rules
+
+moved snort_rules directory into deps/, switched to Emerging Threats signature set
+------------------------------------------------------------------------
+r446 | mbr | 2008-08-12 23:09:20 -0400 (Tue, 12 Aug 2008) | 1 line
+Changed paths:
+   D /fwsnort/trunk/snort_rules/bleeding-all.rules
+   A /fwsnort/trunk/snort_rules/emerging-all.rules
+
+removed bleeding-all.rules and added emerging-all.rules since Matt Jonkman has switched to Emerging Threats
+------------------------------------------------------------------------
+r444 | mbr | 2008-08-09 11:23:19 -0400 (Sat, 09 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/install.pl
+
+chdir path bugfix
+------------------------------------------------------------------------
+r443 | mbr | 2008-08-09 11:18:59 -0400 (Sat, 09 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/VERSION
+   M /fwsnort/trunk/fwsnort
+   M /fwsnort/trunk/packaging/fwsnort-nodeps.spec
+   M /fwsnort/trunk/packaging/fwsnort.spec
+
+bumped version to 1.0.5-pre1
+------------------------------------------------------------------------
+r442 | mbr | 2008-08-09 11:14:27 -0400 (Sat, 09 Aug 2008) | 5 lines
+Changed paths:
+   M /fwsnort/trunk/ChangeLog
+   M /fwsnort/trunk/fwsnort
+   M /fwsnort/trunk/fwsnort.conf
+
+Updated to import perl modules from /usr/lib/fwsnort, but only if this
+path actually exists in the filesystem.  This is similar to the strategy
+implemented by psad.  A new variable FWSNORT_LIBS_DIR was added to the
+fwsnort.conf to support this.
+
+------------------------------------------------------------------------
+r441 | mbr | 2008-08-09 11:12:49 -0400 (Sat, 09 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/INSTALL
+
+added dependencies discussion
+------------------------------------------------------------------------
+r440 | mbr | 2008-08-09 11:09:41 -0400 (Sat, 09 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/CREDITS
+
+update for Franck
+------------------------------------------------------------------------
+r439 | mbr | 2008-08-09 11:05:50 -0400 (Sat, 09 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/install.pl
+
+minor bugfix to include missed skip_module_install var
+------------------------------------------------------------------------
+r438 | mbr | 2008-08-07 05:17:04 -0400 (Thu, 07 Aug 2008) | 1 line
+Changed paths:
+   A /fwsnort/trunk/packaging/fwsnort-nodeps.spec
+   M /fwsnort/trunk/packaging/fwsnort.spec
+
+added fwsnort-nodeps.spec file, updated fwsnort.spec to handle deps/ directory
+------------------------------------------------------------------------
+r437 | mbr | 2008-08-07 05:07:10 -0400 (Thu, 07 Aug 2008) | 1 line
+Changed paths:
+   D /fwsnort/trunk/IPTables-Parse
+   D /fwsnort/trunk/Net-IPv4Addr
+   A /fwsnort/trunk/deps/IPTables-Parse (from /fwsnort/trunk/IPTables-Parse:436)
+   A /fwsnort/trunk/deps/Net-IPv4Addr (from /fwsnort/trunk/Net-IPv4Addr:436)
+
+moved IPTables-Parse and Net-IPv4Addr to the deps/ directory
+------------------------------------------------------------------------
+r436 | mbr | 2008-08-06 04:13:49 -0400 (Wed, 06 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/install.pl
+
+added code to handle new deps/ directory
+------------------------------------------------------------------------
+r435 | mbr | 2008-08-06 04:11:53 -0400 (Wed, 06 Aug 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/fwsnort.8
+
+minor update to include contributors
+------------------------------------------------------------------------
+r434 | mbr | 2008-08-06 04:10:41 -0400 (Wed, 06 Aug 2008) | 1 line
+Changed paths:
+   A /fwsnort/trunk/deps
+   A /fwsnort/trunk/deps/README
+
+added deps/ directory
+------------------------------------------------------------------------
+r433 | mbr | 2008-06-19 23:51:04 -0400 (Thu, 19 Jun 2008) | 3 lines
+Changed paths:
+   M /fwsnort/trunk/CREDITS
+   M /fwsnort/trunk/fwsnort.8
+
+Franck Joncourt
+    - Submitted patch to fix double dash format in fwsnort man page.
+
+------------------------------------------------------------------------
+r432 | mbr | 2008-02-17 21:36:18 -0500 (Sun, 17 Feb 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/fwsnort.8
+
+minor contributor update
+------------------------------------------------------------------------
+r431 | mbr | 2008-02-17 01:05:01 -0500 (Sun, 17 Feb 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/fwsnort
+
+minor usage update
+------------------------------------------------------------------------
+r430 | mbr | 2008-02-17 01:04:04 -0500 (Sun, 17 Feb 2008) | 1 line
+Changed paths:
+   M /fwsnort/trunk/fwsnort
+
+minor usage update
+------------------------------------------------------------------------
