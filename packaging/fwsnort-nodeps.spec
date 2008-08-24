@@ -35,7 +35,7 @@ fwsnort implements a patch against iptables-1.2.7a which adds a
 "--hex-string" option which will accept content fields such as
 "|0d0a5b52504c5d3030320d0a|". fwsnort is able to translate approximately 60%
 of all rules from the Snort-2.3.3 IDS into equivalent iptables rules. For
-more information about the translation strat- egy as well as
+more information about the translation strategy as well as
 advantages/disadvantages of the method used by fwsnort to obtain intrusion
 detection data, see the README included with the fwsnort sources or browse
 to: http://www.cipherdyne.org/fwsnort/
@@ -84,8 +84,8 @@ install -m 644 fwsnort.8 $RPM_BUILD_ROOT%{_mandir}/man8/
 %config(noreplace) %_sysconfdir/%name/fwsnort.conf
 
 %changelog
-* Thu Aug 17 2008 Michael Rash <mbr@cipherydne.org>
-- Updated to use the deps/ directory for all perl module sources.
+* Thu Aug 21 2008 Michael Rash <mbr@cipherydne.org>
+- Added the fwsnort-nodeps.spec file.
 - fwsnort-1.0.5 release
 
 * Tue Jan 22 2008 Michael Rash <mbr@cipherydne.org>

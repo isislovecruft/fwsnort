@@ -14,7 +14,7 @@
 #
 # Credits: (see the CREDITS file)
 #
-# Version: 1.0.5-pre4
+# Version: 1.0.5
 #
 # Copyright (C) 2003-2007 Michael Rash (mbr@cipherdyne.org)
 #
@@ -85,7 +85,7 @@
 #
 ############################################################################
 #
-# $Id: fwsnort 466 2008-08-16 04:49:50Z mbr $
+# $Id: fwsnort 472 2008-08-22 00:22:28Z mbr $
 #
 
 use IO::Socket;
@@ -114,8 +114,8 @@ my $ipt_script = "${fwsnort_dir}/fwsnort.sh";
 #===================== end config =======================
 
 ### version number
-my $version = '1.0.5-pre4';
-my $revision_svn = '$Revision: 466 $';
+my $version = '1.0.5';
+my $revision_svn = '$Revision: 472 $';
 my $rev_num = '1';
 ($rev_num) = $revision_svn =~ m|\$Rev.*:\s+(\S+)|;
 
