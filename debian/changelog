@@ -2,7 +2,7 @@ fwsnort (1.0.5-1) unstable; urgency=low
 
   * New upstream release.
   * Added README.Debian. 
-  * Removed copyright from the old bleeding ruleset.
+  * Removed copyright for the old bleeding ruleset.
   * Added a dependency on the snort-rules-default package.
   * Updated watch file to handle the nodeps tarballs.
 
