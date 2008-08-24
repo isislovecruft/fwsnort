@@ -3,7 +3,7 @@ Snort rules
 
 The Debian package of fwsnort does not contain any ruleset.
 
-You can however get the latest emerging threats rules from their website
+However, you can get the latest emerging threats rules from their website
 (http://www.emergingthreats.net) by running one of the following commands:
 
 [code]
