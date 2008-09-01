@@ -1,7 +1,7 @@
 Source: fwsnort
 Section: admin
 Priority: optional
-Build-Depends: debhelper (>= 7)
+Build-Depends: debhelper (>= 5)
 Build-Depends-Indep: po-debconf
 Maintainer: Franck Joncourt <franck.mail@dthconnex.com>
 Standards-Version: 3.8.0
