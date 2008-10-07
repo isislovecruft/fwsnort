@@ -3,9 +3,13 @@
 # Source debconf library
 . /usr/share/debconf/confmodule
 
-# Check their answer
-db_get fwsnort/download
-[ "$RET" = "true" ] && fwsnort --update-rules
+if [ "$1" = "configure" ]; then
+
+    # Check their answer
+    db_get fwsnort/download
+    [ "$RET" = "true" ] && fwsnort --update-rules
+
+fi
 
 #DEBHELPER#
 

@@ -1,3 +1,9 @@
+fwsnort (1.0.5-2) unstable; urgency=low
+
+  * Restricted the use of debconf in both fwsnort.config and fwsnort.postinst.
+
+ -- Franck Joncourt <franck.mail@dthconnex.com>  Tue, 07 Oct 2008 23:32:25 +0200
+
 fwsnort (1.0.5-1) unstable; urgency=low
 
   * New upstream release.
