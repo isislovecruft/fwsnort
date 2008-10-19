@@ -11,7 +11,7 @@ Package: fwsnort
 Architecture: all
 Depends: ${perl:Depends}, ${misc:Depends}, iptables, libnetwork-ipv4addr-perl, libiptables-parse-perl
 Recommends: snort-rules-default
-Description: Firewall Snort 
+Description: makes use of Snort rules in an iptables-based firewall 
  Fwsnort translates Snort rules into iptables rule approximations and generates
  a Bourne shell script that implements the resulting iptables commands.
  .
