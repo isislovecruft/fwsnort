@@ -1,6 +1,6 @@
 Format-Specification: http://wiki.debian.org/Proposals/CopyrightFormat
 Upstream-Name: fwsnort
-Upstream-Maintainer: Franck Joncourt <franck.mail@dthconnex.com>
+Upstream-Maintainer: Michael B. Rash <mbr@cipherdyne.com>
 Upstream-Source: http://www.cipherdyne.org/fwsnort/download/
 
 Files: *
