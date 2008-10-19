@@ -1,7 +1,5 @@
 #!/usr/bin/make -f
   
-#export DH_VERBOSE=1
-
 INSTALL		= install
 INSTALL_PROGRAM = $(INSTALL)
 INSTALL_DATA    = $(INSTALL) -m 644
