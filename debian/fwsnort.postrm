@@ -9,7 +9,7 @@ if [ "$1"  = "purge" ]; then
 	# By default fwsnort logs all parse errors to /var/log/fwsnort.log
 	[ -f /var/log/fwsnort.log ] && rm /var/log/fwsnort.log
 
-	# Every time fwsnort is used to generated an iptables script, if an old
+	# Every time fwsnort is used to generate an iptables script, if an old
 	# script is found, the previous one is moved to the archives directory.
 	# Therefore, we have to make sure we remove this directory and the default
 	# script fwsnort.sh.
@@ -19,7 +19,7 @@ if [ "$1"  = "purge" ]; then
 		rmdir /etc/fwsnort/archive
 	fi
 
-	# We take care of the default directory where the user can store his rules.
+	# We take care of the default directory where users can store their rules.
 	if [ -d /etc/fwsnort/snort_rules ]; then
 		find /etc/fwsnort/snort_rules/ -type f -exec rm {} \;
 	fi
