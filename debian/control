@@ -5,6 +5,8 @@ Build-Depends: debhelper (>= 5)
 Build-Depends-Indep: po-debconf
 Maintainer: Franck Joncourt <franck.mail@dthconnex.com>
 Standards-Version: 3.8.0
+Vcs-git: git://git.debian.org/git/collab-maint/fwsnort.git
+Vcs-Browser: http://git.debian.org/?p=collab-maint/fwsnort.git;a=summary
 Homepage: http://www.cipherdyne.org/fwsnort/
 
 Package: fwsnort
