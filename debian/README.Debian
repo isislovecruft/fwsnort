@@ -17,7 +17,7 @@ rules that you can then manage by oinkmaster.
 
 If you handle rulesets from different directories (for example to use both
 the rules from Emerging Threats and the ones from the snort-rules-default
- package) then you can run this command: 
+package) then you can run this command:
 
  fwsnort --snort-rdir /etc/snort/rules,/etc/fwsnort/snort_rules
 
