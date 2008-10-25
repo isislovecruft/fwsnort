@@ -1,0 +1,37 @@
+# translation of ru.po to Russian
+# fwsnort - Snort-to-iptables rule translator.
+# Copyright (C) 2008
+# This file is distributed under the same license as the fwsnort package.
+#
+# Franck Joncourt <franck.mail@dthconnex.com>, 2008.
+# Yuri Kozlov <kozlov.y@gmail.com>, 2008.
+msgid ""
+msgstr ""
+"Project-Id-Version: fwsnort 1.0.5\n"
+"Report-Msgid-Bugs-To: fwsnort@packages.debian.org\n"
+"POT-Creation-Date: 2008-10-21 22:47+0200\n"
+"PO-Revision-Date: 2008-10-23 20:51+0400\n"
+"Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
+"Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#. Type: boolean
+#. Description
+#: ../fwsnort.templates:1001
+msgid "Download the rules?"
+msgstr "Скачать правила?"
+
+#. Type: boolean
+#. Description
+#: ../fwsnort.templates:1001
+msgid ""
+"The latest Snort rules can be downloaded from http://www.emergingthreats.net "
+"in order to keep fwsnort up-to-date."
+msgstr ""
+"Чтобы поддержать fwsnort в актуальном состоянии можно "
+"скачать правила Snort с сайта http://www.emergingthreats.net."
+
