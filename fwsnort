@@ -14,7 +14,7 @@
 #
 # Credits: (see the CREDITS file)
 #
-# Version: 1.0.5
+# Version: 1.0.6-pre1
 #
 # Copyright (C) 2003-2007 Michael Rash (mbr@cipherdyne.org)
 #
@@ -85,7 +85,7 @@
 #
 ############################################################################
 #
-# $Id: fwsnort 472 2008-08-22 00:22:28Z mbr $
+# $Id: fwsnort 482 2009-01-31 03:00:25Z mbr $
 #
 
 use IO::Socket;
@@ -114,8 +114,8 @@ my $ipt_script = "${fwsnort_dir}/fwsnort.sh";
 #===================== end config =======================
 
 ### version number
-my $version = '1.0.5';
-my $revision_svn = '$Revision: 472 $';
+my $version = '1.0.6-pre1';
+my $revision_svn = '$Revision: 482 $';
 my $rev_num = '1';
 ($rev_num) = $revision_svn =~ m|\$Rev.*:\s+(\S+)|;
 
@@ -1717,10 +1717,11 @@ sub ipt_build_rule() {
         $rule .= " $ipt_hdr_opts{'dport'} $hdr_href->{'dport'}";
     }
 
-    &ipt_build_opts($rule, $hdr_href, $opts_href, $content_aref,
+    my $rv = &ipt_build_opts($rule, $hdr_href, $opts_href, $content_aref,
         $offsets_href, $orig_snort_rule, $flow_logging_prefix,
         $chain, $add_snort_comment);
-    return 1;
+
+    return $rv;
 }
 
 sub ipt_build_opts() {
@@ -1850,7 +1851,8 @@ sub ipt_build_opts() {
     my $ipt_content_criteria = &build_content_matches($opts_href,
             $content_aref, $offsets_href, $avg_hdr_len);
 
-    $rule .= $ipt_content_criteria if $ipt_content_criteria;
+    return 0 unless $ipt_content_criteria;
+    $rule .= $ipt_content_criteria;
 
     ### print the rest of the logprefix snort options in a comment
     ### one line above the rule
@@ -1932,7 +1934,7 @@ sub ipt_build_opts() {
     ### write the rule out to the iptables script
     &ipt_add_rule($hdr_href, $opts_href, $orig_snort_rule,
         $rule, $target_str, "### $comment", $add_snort_comment);
-    return;
+    return 1;
 }
 
 sub build_content_matches() {
@@ -1958,6 +1960,10 @@ sub build_content_matches() {
 
         ### handles length of hex blocks
         my $content_len = &get_content_len($content_str);
+        if ($content_len >= $config{'MAX_STRING_LEN'}) {
+        	$ipt_content_criteria = '';
+        	last;
+    	}
 
         if ($content_str =~ /\|.+\|/) {
             ### there is hex data in the content
@@ -2608,12 +2614,13 @@ sub fwsnort_init() {
                 = $snort_opts{'filter'}{$opt};
             delete $snort_opts{'filter'}{$opt};
         }
-        my @ignore = qw/nocase threshold/;
+        my @ignore = qw/nocase/;
 
         if ($kernel_ver eq '2.4') {
             push @ignore, 'offset', 'depth';
         }
         for my $opt (@ignore) {
+            next unless defined $snort_opts{'ignore'}{$opt};
             $snort_opts{'unsupported'}{$opt}
                 = $snort_opts{'ignore'}{$opt};
             delete $snort_opts{'ignore'}{$opt};
@@ -2766,7 +2773,7 @@ sub required_vars() {
         AVG_TCP_HEADER_LEN MAX_FRAME_LEN FWSNORT_INPUT FWSNORT_INPUT_ESTAB
         FWSNORT_OUTPUT FWSNORT_OUTPUT_ESTAB FWSNORT_FORWARD
         FWSNORT_FORWARD_ESTAB FWSNORT_INPUT_JUMP FWSNORT_OUTPUT_JUMP
-        FWSNORT_FORWARD_JUMP FWSNORT_LIBS_DIR
+        FWSNORT_FORWARD_JUMP FWSNORT_LIBS_DIR MAX_STRING_LEN
     );
     for my $var (@required_vars) {
         die "[*] Variable $var not defined in $fwsnort_conf. Exiting.\n"
@@ -3055,7 +3062,7 @@ sub setup() {
 
 sub update_rules() {
     my $url = 'http://www.emergingthreats.net/rules/emerging-all.rules';
-    print "[+] Downloading latest rules:\n    $url\n";
+    print "[+] Downloading latest rules into $rules_dir/\n    $url\n";
     my $dir = $rules_dir;
     $dir =~ s/\,.*//;
     chdir $dir or die "[*] Could not chdir $dir: $!";
