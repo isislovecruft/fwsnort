@@ -1,5 +1,6 @@
-fwsnort (1.0.5-2) unstable; urgency=low
+fwsnort (1.0.6~svn.pre1-1) unstable; urgency=low
 
+  * New Upstream Version
   * New po-debconf translation - Japanese (Closes: #510716)
 
  -- Franck Joncourt <franck.mail@dthconnex.com>  Sun, 04 Jan 2009 20:40:31 +0100
