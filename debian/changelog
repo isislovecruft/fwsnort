@@ -1,6 +1,10 @@
 fwsnort (1.0.6~svn.pre2-1) unstable; urgency=low
 
   * New upstream release.
+  * d.control: Bumped up Standards-Version to 3.8.1 (no changes).
+  * Switch to dh7
+    + Updated d.compat
+    + Updated d.control Build Dependency
 
  -- Franck Joncourt <franck.mail@dthconnex.com>  Wed, 22 Apr 2009 20:43:35 +0200
 
