@@ -5,6 +5,7 @@ fwsnort (1.0.6~svn.pre2-1) unstable; urgency=low
   * Switch to dh7
     + Updated d.compat
     + Updated d.control Build Dependency
+    + Updated d.rules
 
  -- Franck Joncourt <franck.mail@dthconnex.com>  Wed, 22 Apr 2009 20:43:35 +0200
 
