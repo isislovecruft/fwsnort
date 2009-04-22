@@ -1,7 +1,13 @@
-fwsnort (1.0.6~svn.pre1-1) unstable; urgency=low
+fwsnort (1.0.6~svn.pre2-1) unstable; urgency=low
 
-  * New Upstream Version
+  * New upstream release.
+
+ -- Franck Joncourt <franck.mail@dthconnex.com>  Wed, 22 Apr 2009 20:43:35 +0200
+
+fwsnort (1.0.5-2) unstable; urgency=low
+
   * New po-debconf translation - Japanese (Closes: #510716)
+  * Added DM-Upload-Allowed flag.
 
  -- Franck Joncourt <franck.mail@dthconnex.com>  Sun, 04 Jan 2009 20:40:31 +0100
 
