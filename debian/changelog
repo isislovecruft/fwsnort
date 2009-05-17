@@ -1,6 +1,7 @@
 fwsnort (1.0.6~svn.pre3-1) unstable; urgency=low
 
   * New Upstream Version
+  * Use the new syntax for iptables negation (Closes: #526622)
 
  -- Franck Joncourt <franck.mail@dthconnex.com>  Sun, 17 May 2009 12:23:51 +0200
 
