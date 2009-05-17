@@ -14,7 +14,7 @@
 #
 # Credits: (see the CREDITS file)
 #
-# Version: 1.0.6-pre2
+# Version: 1.0.6-pre3
 #
 # Copyright (C) 2003-2007 Michael Rash (mbr@cipherdyne.org)
 #
@@ -85,7 +85,7 @@
 #
 ############################################################################
 #
-# $Id: fwsnort 486 2009-04-22 02:26:57Z mbr $
+# $Id: fwsnort 490 2009-05-16 15:20:54Z mbr $
 #
 
 use IO::Socket;
@@ -114,8 +114,8 @@ my $ipt_script = "${fwsnort_dir}/fwsnort.sh";
 #===================== end config =======================
 
 ### version number
-my $version = '1.0.6-pre2';
-my $revision_svn = '$Revision: 486 $';
+my $version = '1.0.6-pre3';
+my $revision_svn = '$Revision: 490 $';
 my $rev_num = '1';
 ($rev_num) = $revision_svn =~ m|\$Rev.*:\s+(\S+)|;
 
@@ -935,7 +935,7 @@ sub parse_rule_options() {
         }
     }
 
-    while ($rule_options =~ /(\w+):\s*(.*?)\s*;/g) {
+    while ($rule_options =~ /(\w+):\s*(.*?[^\x5c]);/g) {
         my $opt = $1;
         my $val = $2;
         if ($opt eq 'content' or $opt eq 'uricontent') {
