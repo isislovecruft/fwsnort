@@ -1,3 +1,9 @@
+fwsnort (1.0.6~svn.pre4-1) unstable; urgency=low
+
+  * New Upstream Version
+
+ -- Franck Joncourt <franck.mail@dthconnex.com>  Thu, 28 May 2009 00:34:44 +0200
+
 fwsnort (1.0.6~svn.pre3-1) unstable; urgency=low
 
   * New Upstream Version
