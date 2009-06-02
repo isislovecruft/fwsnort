@@ -1,5 +1,5 @@
 %define name fwsnort
-%define version 1.0.5
+%define version 1.0.6
 %define release 1
 %define fwsnortlibdir %_libdir/%name
 %define fwsnortlogdir /var/log/fwsnort
@@ -8,7 +8,7 @@
 ### This may be 'i386-linux', or 'i686-linux-thread-multi', etc.
 %define fwsnortmoddir `perl -e '$path='i386-linux'; for (@INC) { if($_ =~ m|.*/(.*linux.*)|) {$path = $1; last; }} print $path'`
 
-Summary: Fwsnort translates Snort rules into equivalent Netfilter rules
+Summary: Fwsnort translates Snort rules into equivalent iptables rules
 Name: %name
 Version: %version
 Release: %release
@@ -18,6 +18,7 @@ Url: http://www.cipherdyne.org/fwsnort/
 Source: %name-%version.tar.gz
 BuildRoot: %_tmppath/%{name}-buildroot
 Requires: iptables
+BuildRequires: perl-ExtUtils-MakeMaker
 #Prereq: rpm-helper
 
 %description
@@ -122,6 +123,10 @@ cp -r deps/snort_rules $RPM_BUILD_ROOT%_sysconfdir/%name
 %_libdir/%name
 
 %changelog
+* Sat May 29 2009 Michael Rash <mbr@cipherydne.org>
+- Added the "BuildRequires: perl-ExtUtils-MakeMaker" statement.
+- fwsnort-1.0.6 release
+
 * Thu Aug 21 2008 Michael Rash <mbr@cipherydne.org>
 - Updated to use the deps/ directory for all perl module sources.
 - fwsnort-1.0.5 release
