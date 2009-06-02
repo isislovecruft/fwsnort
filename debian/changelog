@@ -1,26 +1,14 @@
-fwsnort (1.0.6~svn.pre4-1) unstable; urgency=low
-
-  * New Upstream Version
-
- -- Franck Joncourt <franck.mail@dthconnex.com>  Thu, 28 May 2009 00:34:44 +0200
-
-fwsnort (1.0.6~svn.pre3-1) unstable; urgency=low
+fwsnort (1.0.6-1) unstable; urgency=low
 
   * New Upstream Version
   * Use the new syntax for iptables negation (Closes: #526622)
-
- -- Franck Joncourt <franck.mail@dthconnex.com>  Sun, 17 May 2009 12:23:51 +0200
-
-fwsnort (1.0.6~svn.pre2-1) unstable; urgency=low
-
-  * New upstream release.
   * d.control: Bumped up Standards-Version to 3.8.1 (no changes).
   * Switch to dh7
     + Updated d.compat
     + Updated d.control Build Dependency
     + Updated d.rules
 
- -- Franck Joncourt <franck.mail@dthconnex.com>  Wed, 22 Apr 2009 20:43:35 +0200
+ -- Franck Joncourt <franck.mail@dthconnex.com>  Tue, 02 Jun 2009 20:03:44 +0200
 
 fwsnort (1.0.5-2) unstable; urgency=low
 
