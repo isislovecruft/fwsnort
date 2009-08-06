@@ -1,6 +1,7 @@
 fwsnort (1.0.6-2) unstable; urgency=low
 
   * d.control: Bumped up Standards-Version to 3.8.2 (no changes).
+  * d.copyright: Updated copyright years.
 
  -- Franck Joncourt <franck.mail@dthconnex.com>  Thu, 06 Aug 2009 13:18:22 +0200
 
