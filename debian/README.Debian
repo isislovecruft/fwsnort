@@ -12,6 +12,11 @@ or
 
 The new ruleset will be saved in /etc/fwsnort/snort_rules.
 
+By using dpkg-reconfigure to update the rules, your choice will be saved.
+Then, for each upgrade of the package the rules will be updated. If you
+decide you do not want this feature anymore, you can simply reconfigure
+fwsnort with dpkg-reconfigure, and change your choice to No.
+
 The snort-rules-default package is recommended and can provide you with more
 rules that you can then manage by oinkmaster.
 
