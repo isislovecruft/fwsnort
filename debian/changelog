@@ -4,8 +4,10 @@ fwsnort (1.0.6-2) unstable; urgency=low
   * Updated copyright years in d.changelog.
   * Updated README.Debian to explain a bit more how to handle the choice to
     download the snort rules.
-  * d.fwsnort.config does not pass -e to the shell on the #! line anymore,
-    but set it in the body of the script with set -e (Debian Policy 10.4).
+  * Do not pass -e to the shell on the #! line anymore, but set it in the body
+    of the script with set -e (Debian Policy 10.4) in the following files:
+      + d.fwsnort.config
+      + d.fwsnort.postinst
 
  -- Franck Joncourt <franck.mail@dthconnex.com>  Thu, 06 Aug 2009 13:18:22 +0200
 
