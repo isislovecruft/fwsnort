@@ -1,4 +1,4 @@
-fwsnort (1.0.6-2) unstable; urgency=low
+fwsnort (1.0.6-2) UNRELEASED; urgency=low
 
   * d.control: Bumped up Standards-Version to 3.8.2 (no changes).
   * Updated copyright years in d.changelog.
