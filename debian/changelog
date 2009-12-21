@@ -8,8 +8,9 @@ fwsnort (1.0.6-2) UNRELEASED; urgency=low
     of the script with set -e (Debian Policy 10.4) in the following files:
       + d.fwsnort.config
       + d.fwsnort.postinst
+  * Updated maintainer email address in d.control and d.changelog
 
- -- Franck Joncourt <franck.mail@dthconnex.com>  Sun, 30 Aug 2009 22:36:53 +0200
+ -- Franck Joncourt <franck@debian.org>  Mon, 21 Dec 2009 18:34:52 +0100
 
 fwsnort (1.0.6-1) unstable; urgency=low
 

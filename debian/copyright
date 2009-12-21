@@ -13,7 +13,7 @@ License: GPL-2+
  Debian system under /usr/share/common-licenses/
 
 Files: debian/*
-Copyright: Copyright 2008-2009 by Franck Joncourt <franck.mail@dthconnex.com>
+Copyright: Copyright 2008-2009 by Franck Joncourt <franck@debian.org>
 License: GPL-2+
  Debian packaging is licensed under the same terms as the software itself 
  (see above).

@@ -3,7 +3,7 @@ Section: admin
 Priority: optional
 Build-Depends: debhelper (>= 7)
 Build-Depends-Indep: po-debconf
-Maintainer: Franck Joncourt <franck.mail@dthconnex.com>
+Maintainer: Franck Joncourt <franck@debian.org>
 Standards-Version: 3.8.3
 Vcs-git: git://git.debian.org/git/collab-maint/fwsnort.git
 Vcs-Browser: http://git.debian.org/?p=collab-maint/fwsnort.git;a=summary
