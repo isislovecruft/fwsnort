@@ -1,8 +1,20 @@
 fwsnort (1.1-1) UNRELEASED; urgency=low
 
-  * Added IPV6 support through the --ip6tables (-6) command line option.
-  * Logs are now moved, by default, to /var/log/fwsnort/fwsnort.log instead
-    /var/log/fwsnort.log.
-  * Perl trigger are now available.
+  The ability to build an fwsnort policy that utilizes ip6tables instead
+  of iptables is now available. This allows fwsnort filtering and altering
+  capabilities to apply to IPv6 traffic instead of just IPv4 traffic.
+  To enable ip6tables usage, use the "-6" or "--ip6tables" command line
+  arguments.
+
+  Fwsnort now creates logs in the /var/log/fwsnort/ directory instead of
+  directly in the /var/log/ directory. The path is controlled by a new
+  variable 'LOG_FILE' in the /etc/fwsnort/fwsnort.conf file.
+
+  Snort rules can easily be tested by the use of the new
+   --include-perl-triggers command line argument. This argument instructs
+  fwsnort to include 'perl -e print ... ' commands as comments in the
+  /etc/fwsnort/fwsnort.sh script, and these commands can be combined
+  with netcat to send payloads across the wire that match Snort
+  rules.
 
  -- Franck Joncourt <franck@debian.org>  Fri, 08 Jan 2010 20:01:51 +0100
