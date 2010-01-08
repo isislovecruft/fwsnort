@@ -1,3 +1,25 @@
+fwsnort-1.1 (01/05/2010):
+    - Added the ability to build an fwsnort policy that utilizes ip6tables
+      instead of iptables.  This allows fwsnort filtering and altering
+      capabilities to apply to IPv6 traffic instead of just IPv4 traffic.  To
+      enable ip6tables usage, use the "-6" or "--ip6tables" command line
+      arguments.
+    - Added the --include-perl-triggers command line argument so that
+      translated Snort rules can easily be tested.  This argument instructs
+      fwsnort to include 'perl -e print ... ' commands as comments in the
+      /etc/fwsnort/fwsnort.sh script, and these commands can be combined
+      with netcat to send payloads across the wire that match Snort rules.
+    - Updated fwsnort to create logs in the /var/log/fwsnort/ directory
+      instead of directly in the /var/log/ directory.  The path is controlled
+      by a new variable 'LOG_FILE' in the /etc/fwsnort/fwsnort.conf file.
+    - Added several variables in /etc/fwsnort/fwsnort.conf to control paths
+      to everything from the config file to the snort rules path.  Coupled
+      with this is the ability to create variables within path components and
+      fwsnort will expand them (e.g. 'CONF_DIR /etc/fwsnort;
+      CONF_FILE $CONF_DIR/fwsnort.conf').
+    - Added --Last-cmd arg so that it is easy to rebuild the fwsnort.sh script
+      with the same command line args as the previous execution.
+
 fwsnort-1.0.6 (05/30/2009):
     - (Franck Joncourt) Updated fwsnort to use the "! <option> <arg>" syntax
       instead of the older "<option> ! <arg>" for the iptables command line.
