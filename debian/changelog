@@ -1,4 +1,4 @@
-fwsnort (1.1-1) UNRELEASED; urgency=low
+fwsnort (1.1-1) unstable; urgency=low
 
   * New upstream release.
   * Bumped up Standards-Version to 3.8.3 (no changes).
@@ -12,7 +12,7 @@ fwsnort (1.1-1) UNRELEASED; urgency=low
   * Updated maintainer email address in d.control and d.changelog.
   * Added d.NEWS to report important changes in the package.
 
- -- Franck Joncourt <franck@debian.org>  Fri, 08 Jan 2010 19:53:30 +0100
+ -- Franck Joncourt <franck@debian.org>  Fri, 08 Jan 2010 21:33:17 +0100
 
 fwsnort (1.0.6-1) unstable; urgency=low
 

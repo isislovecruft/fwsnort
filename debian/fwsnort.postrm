@@ -6,8 +6,11 @@ set -e
 # some files.
 if [ "$1"  = "purge" ]; then
 
-	# By default fwsnort logs all parse errors to /var/log/fwsnort.log
-	[ -f /var/log/fwsnort.log ] && rm /var/log/fwsnort.log
+	# Remove old log files (default directory)
+	if [ -d /var/log/fwsnort ]; then
+		find /var/log/fwsnort/ -type f -exec rm {} \;
+		rmdir /var/log/fwsnort
+	fi
 
 	# Every time fwsnort is used to generate an iptables script, if an old
 	# script is found, the previous one is moved to the archives directory.

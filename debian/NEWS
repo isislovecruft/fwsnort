@@ -1,4 +1,4 @@
-fwsnort (1.1-1) UNRELEASED; urgency=low
+fwsnort (1.1-1) unstable; urgency=low
 
   The ability to build an fwsnort policy that utilizes ip6tables instead
   of iptables is now available. This allows fwsnort filtering and altering
@@ -17,4 +17,4 @@ fwsnort (1.1-1) UNRELEASED; urgency=low
   with netcat to send payloads across the wire that match Snort
   rules.
 
- -- Franck Joncourt <franck@debian.org>  Fri, 08 Jan 2010 20:01:51 +0100
+ -- Franck Joncourt <franck@debian.org>  Fri, 08 Jan 2010 21:33:33 +0100
