@@ -1,210 +1,132 @@
 ------------------------------------------------------------------------
-r504 | mbr | 2009-05-30 17:49:05 -0400 (Sat, 30 May 2009) | 1 line
+r523 | mbr | 2010-01-05 21:37:24 -0500 (Tue, 05 Jan 2010) | 1 line
 Changed paths:
-   M /fwsnort/branches/fwsnort-1.0.6/ChangeLog
+   A /fwsnort/branches/fwsnort-1.1 (from /fwsnort/trunk:522)
 
-added blurb about the fwsnort-nobuildreqs.spec file
+created fwsnort-1.1 release branch
 ------------------------------------------------------------------------
-r503 | mbr | 2009-05-30 17:37:57 -0400 (Sat, 30 May 2009) | 1 line
+r522 | mbr | 2010-01-05 20:54:52 -0500 (Tue, 05 Jan 2010) | 1 line
 Changed paths:
-   D /fwsnort/branches/fwsnort-1.0.6/packaging/fwsnort-debian.spec
-   A /fwsnort/branches/fwsnort-1.0.6/packaging/fwsnort-nobuildreqs.spec (from /fwsnort/branches/fwsnort-1.0.6/packaging/fwsnort-debian.spec:502)
+   M /fwsnort/trunk/fwsnort.8
 
-moved fwsnort-debian.spec -> fwsnort-nobuildreqs.spec
+minor update Snort -> SNORT
 ------------------------------------------------------------------------
-r502 | mbr | 2009-05-30 17:37:25 -0400 (Sat, 30 May 2009) | 1 line
-Changed paths:
-   A /fwsnort/branches/fwsnort-1.0.6/packaging/fwsnort-debian.spec
-
-added fwsnort-debian.spec file to build fwsnort on Debian (or other) systems that are not based on RPM to install/upgrade software
-------------------------------------------------------------------------
-r501 | mbr | 2009-05-30 17:31:22 -0400 (Sat, 30 May 2009) | 1 line
-Changed paths:
-   M /fwsnort/branches/fwsnort-1.0.6/packaging/fwsnort-nodeps.spec
-   M /fwsnort/branches/fwsnort-1.0.6/packaging/fwsnort.spec
-
-minor wording update - Netfilter -> iptables
-------------------------------------------------------------------------
-r500 | mbr | 2009-05-29 22:40:22 -0400 (Fri, 29 May 2009) | 1 line
-Changed paths:
-   A /fwsnort/branches/fwsnort-1.0.6 (from /fwsnort/trunk:499)
-
-created fwsnort-1.0.6 branch
-------------------------------------------------------------------------
-r499 | mbr | 2009-05-29 22:39:38 -0400 (Fri, 29 May 2009) | 1 line
-Changed paths:
-   M /fwsnort/trunk/packaging/fwsnort-nodeps.spec
-   M /fwsnort/trunk/packaging/fwsnort.spec
-
-version 1.0.6
-------------------------------------------------------------------------
-r498 | mbr | 2009-05-29 22:39:14 -0400 (Fri, 29 May 2009) | 1 line
+r521 | mbr | 2010-01-05 20:36:34 -0500 (Tue, 05 Jan 2010) | 1 line
 Changed paths:
    M /fwsnort/trunk/ChangeLog
    M /fwsnort/trunk/VERSION
    M /fwsnort/trunk/fwsnort
-
-version 1.0.6
-------------------------------------------------------------------------
-r497 | mbr | 2009-05-29 22:39:00 -0400 (Fri, 29 May 2009) | 1 line
-Changed paths:
+   M /fwsnort/trunk/packaging/fwsnort-nobuildreqs.spec
    M /fwsnort/trunk/packaging/fwsnort-nodeps.spec
    M /fwsnort/trunk/packaging/fwsnort.spec
 
-Added the 'BuildRequires: perl-ExtUtils-MakeMaker' statement
+bumped version to 1.1
 ------------------------------------------------------------------------
-r495 | mbr | 2009-05-27 17:29:48 -0400 (Wed, 27 May 2009) | 1 line
+r520 | mbr | 2010-01-05 20:29:45 -0500 (Tue, 05 Jan 2010) | 1 line
+Changed paths:
+   M /fwsnort/trunk/fwsnort.8
+
+added a -6 example to the EXAMPLES section
+------------------------------------------------------------------------
+r518 | mbr | 2010-01-04 22:57:20 -0500 (Mon, 04 Jan 2010) | 1 line
 Changed paths:
    M /fwsnort/trunk/VERSION
    M /fwsnort/trunk/fwsnort
 
-bumped version to fwsnort-1.0.6-pre4
+bumped version to 1.1-pre3
 ------------------------------------------------------------------------
-r494 | mbr | 2009-05-27 17:25:49 -0400 (Wed, 27 May 2009) | 8 lines
+r517 | mbr | 2010-01-04 22:57:08 -0500 (Mon, 04 Jan 2010) | 1 line
 Changed paths:
-   M /fwsnort/trunk/ChangeLog
+   M /fwsnort/trunk/CREDITS
+
+added Guillermo Gomez
+------------------------------------------------------------------------
+r515 | mbr | 2010-01-04 22:51:38 -0500 (Mon, 04 Jan 2010) | 1 line
+Changed paths:
+   M /fwsnort/trunk/VERSION
    M /fwsnort/trunk/fwsnort
 
-- Bug fix to move the 'rawbytes' keyword to the list of keywords that are
-ignored since iptables does a raw match anyway as it doesn't run any
-preprocessors in the Snort sense.
-- Added a small hack to choose the first port from a port list until the
-iptables 'multiport' match is supported.
-- Updated to consolidate spaces in hex matches in the fwsnort.sh script
-since the spaces are not part of patterns to be searched anyway.
-
+bumped version to 1.1-pre2
 ------------------------------------------------------------------------
-r493 | mbr | 2009-05-27 14:25:11 -0400 (Wed, 27 May 2009) | 1 line
-Changed paths:
-   M /fwsnort/trunk/fwsnort
-
-minor cleanup (href->hr, aref->ar)
-------------------------------------------------------------------------
-r492 | mbr | 2009-05-27 13:39:49 -0400 (Wed, 27 May 2009) | 5 lines
+r514 | mbr | 2010-01-04 22:39:53 -0500 (Mon, 04 Jan 2010) | 12 lines
 Changed paths:
    M /fwsnort/trunk/ChangeLog
    M /fwsnort/trunk/fwsnort
    M /fwsnort/trunk/fwsnort.8
+   M /fwsnort/trunk/fwsnort.conf
+   M /fwsnort/trunk/install.pl
 
-- Bug fix to allow case insensitive matches to work properly with the
-  --include-re-caseless and --exclude-re-caseless arguments.
-- Added the --snort-rfile argument so that a specific Snort rules file (or
-list of files separated by commas) is parsed.
+- Updated fwsnort to create logs in the /var/log/fwsnort/ directory
+  instead of directly in the /var/log/ directory.  The path is controlled
+  by a new variable 'LOG_FILE' in the /etc/fwsnort/fwsnort.conf file.
+- Added several variables in /etc/fwsnort/fwsnort.conf to control paths
+  to everything from the config file to the snort rules path.  Coupled
+  with this is the ability to create variables within path components and
+  fwsnort will expand them (e.g. 'CONF_DIR /etc/fwsnort;
+  CONF_FILE $CONF_DIR/fwsnort.conf').
+- Added --Last-cmd arg so that it is easy to rebuild the fwsnort.sh script
+  with the same command line args as the previous execution.
+
 
 ------------------------------------------------------------------------
-r490 | mbr | 2009-05-16 11:20:54 -0400 (Sat, 16 May 2009) | 1 line
+r512 | mbr | 2009-12-21 21:53:12 -0500 (Mon, 21 Dec 2009) | 1 line
 Changed paths:
    M /fwsnort/trunk/VERSION
    M /fwsnort/trunk/fwsnort
 
-updated version to 1.0.6-pre3
+updated version to 1.1
 ------------------------------------------------------------------------
-r489 | mbr | 2009-05-16 11:07:10 -0400 (Sat, 16 May 2009) | 5 lines
-Changed paths:
-   M /fwsnort/trunk/ChangeLog
-   M /fwsnort/trunk/fwsnort
-
-Bug fix to allow fwsnort to properly translate snort rules that have
-"content" fields with embedded escaped semicolons (e.g. "\;").  This
-allows fwsnort to translate about 85 additional rules from the Emerging
-Threats rule set.
-
-------------------------------------------------------------------------
-r488 | mbr | 2009-05-16 10:49:47 -0400 (Sat, 16 May 2009) | 1 line
-Changed paths:
-   M /fwsnort/trunk/deps/snort_rules/emerging-all.rules
-
-updated to the latest rule set from Emerging Threats
-------------------------------------------------------------------------
-r486 | mbr | 2009-04-21 22:26:57 -0400 (Tue, 21 Apr 2009) | 1 line
-Changed paths:
-   M /fwsnort/trunk/VERSION
-   M /fwsnort/trunk/fwsnort
-
-updated to version 1.0.6-pre2
-------------------------------------------------------------------------
-r485 | mbr | 2009-04-21 22:26:43 -0400 (Tue, 21 Apr 2009) | 3 lines
-Changed paths:
-   M /fwsnort/trunk/ChangeLog
-   M /fwsnort/trunk/deps/snort_rules/emerging-all.rules
-
-- Updated to the latest complete rule set from Emerging Threats (see
-http://www.emergingthreats.net/).
-
-------------------------------------------------------------------------
-r484 | mbr | 2009-04-21 22:22:46 -0400 (Tue, 21 Apr 2009) | 3 lines
+r511 | mbr | 2009-12-21 21:52:01 -0500 (Mon, 21 Dec 2009) | 7 lines
 Changed paths:
    M /fwsnort/trunk/CREDITS
    M /fwsnort/trunk/ChangeLog
    M /fwsnort/trunk/fwsnort
-
-- (Franck Joncourt) Updated fwsnort to use the "! <option> <arg>" syntax
-instead of the older "<option> ! <arg>" for the iptables command line.
-
-------------------------------------------------------------------------
-r482 | mbr | 2009-01-30 22:00:25 -0500 (Fri, 30 Jan 2009) | 1 line
-Changed paths:
-   M /fwsnort/trunk/VERSION
-   M /fwsnort/trunk/fwsnort
-
-bumped version to 1.0.6-pre1
-------------------------------------------------------------------------
-r481 | mbr | 2009-01-30 21:59:53 -0500 (Fri, 30 Jan 2009) | 20 lines
-Changed paths:
-   M /fwsnort/trunk/CREDITS
-   M /fwsnort/trunk/ChangeLog
-   M /fwsnort/trunk/fwsnort
+   M /fwsnort/trunk/fwsnort.8
    M /fwsnort/trunk/fwsnort.conf
 
-From: Franck Joncourt <franck.mail@dthconnex.com>
-Subject: [PATCH] fixes/content_length
-
-[quote]
-iptables v1.4.2: STRING too long `|7c|XML|7c
-7c|if|7c|SPAN|7c|navigator|7c|CDATA|7c|http|7c|com|7c|w2k3|7c|appVersion|7c|
-version|7c|nt|7c|7c|X|7c|MSIE|7c|wxp|7c|114|7c|HTML|7c|DATAFLD|7c|DATASRC|7c|
-DATAFORMATAS|7c|ID|7c|while|7c|2003|7c|'
-[/quote]
-
-For the --hex-string and --string matches, if the argument exceeds 128 bytes
-(iptables 1.4.2) then iptables fails as above.
-
-Thus, this patch add a new variable in fwsnort.conf "MAX_STRING_LEN", so that
-the size of the content can be limited. If the content (null terminated string)
-is more than MAX_STRING_LEN chars, fwsnort throws the rule away.
-
-Signed-off-by: Franck Joncourt <franck.mail@dthconnex.com>
+- Added the ability to build an fwsnort policy that utilizes ip6tables
+instead of iptables.  This allows fwsnort filtering and altering
+capabilities to apply to IPv6 traffic instead of just IPv4 traffic.  To
+enable ip6tables usage, use the "-6" or "--ip6tables" command line
+arguments.
 
 
 ------------------------------------------------------------------------
-r480 | mbr | 2008-10-26 19:03:09 -0400 (Sun, 26 Oct 2008) | 1 line
+r510 | mbr | 2009-12-20 23:17:57 -0500 (Sun, 20 Dec 2009) | 8 lines
 Changed paths:
-   M /fwsnort/trunk/CREDITS
+   M /fwsnort/trunk/ChangeLog
+   M /fwsnort/trunk/INSTALL
+   M /fwsnort/trunk/README
+   M /fwsnort/trunk/fwsnort
    M /fwsnort/trunk/fwsnort.8
 
-wording updates for the fwsnort(8) man page from Justin B Rye and Franck Joncourt
+- Added the --include-perl-triggers command line argument so that
+translated Snort rules can easily be tested.  This argument instructs
+fwsnort to include 'perl -e print ... ' commands as comments in the
+/etc/fwsnort/fwsnort.sh script, and these commands can be combined
+with netcat to send payloads across the wire that match Snort rules.
+- Minor documentation fixes.
+
+
 ------------------------------------------------------------------------
-r479 | mbr | 2008-09-30 00:11:04 -0400 (Tue, 30 Sep 2008) | 1 line
+r509 | mbr | 2009-12-20 22:55:01 -0500 (Sun, 20 Dec 2009) | 1 line
 Changed paths:
    M /fwsnort/trunk/deps/snort_rules/emerging-all.rules
 
-content match fix for Emerging Threats Snort rule ID 2007975 (Frank Joncourt)
+updated to the latest Emerging Threats rule set
 ------------------------------------------------------------------------
-r478 | mbr | 2008-09-30 00:10:10 -0400 (Tue, 30 Sep 2008) | 1 line
+r508 | mbr | 2009-07-04 12:13:49 -0400 (Sat, 04 Jul 2009) | 1 line
 Changed paths:
-   M /fwsnort/trunk/fwsnort
+   M /fwsnort/trunk/deps/snort_rules/emerging-all.rules
 
-bugfix in strict mode to use the fact that the threshold keyword is already unsupported (Franck Joncourt)
+updated to the latest Emerging Threats rule set
 ------------------------------------------------------------------------
-r477 | mbr | 2008-08-26 22:38:43 -0400 (Tue, 26 Aug 2008) | 1 line
+r507 | mbr | 2009-05-30 17:57:28 -0400 (Sat, 30 May 2009) | 1 line
 Changed paths:
-   M /fwsnort/trunk/fwsnort
+   M /fwsnort/trunk/ChangeLog
+   A /fwsnort/trunk/packaging/fwsnort-nobuildreqs.spec (from /fwsnort/branches/fwsnort-1.0.6/packaging/fwsnort-nobuildreqs.spec:504)
+   M /fwsnort/trunk/packaging/fwsnort-nodeps.spec
+   M /fwsnort/trunk/packaging/fwsnort.spec
 
-minor update to include download directory in status output in --update mode
-------------------------------------------------------------------------
-r476 | mbr | 2008-08-21 23:26:36 -0400 (Thu, 21 Aug 2008) | 1 line
-Changed paths:
-   M /fwsnort/trunk/packaging/cd_rpmbuilder
-
-updated to correct tar.gz path in --no-deps mode
+merged: svn merge -r 500:504 file:///home/mbr/svn/fwsnort_repos/fwsnort/branches/fwsnort-1.0.6
 ------------------------------------------------------------------------

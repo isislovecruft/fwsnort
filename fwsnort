@@ -14,9 +14,9 @@
 #
 # Credits: (see the CREDITS file)
 #
-# Version: 1.0.6
+# Version: 1.1
 #
-# Copyright (C) 2003-2007 Michael Rash (mbr@cipherdyne.org)
+# Copyright (C) 2003-2010 Michael Rash (mbr@cipherdyne.org)
 #
 # License (GNU Public License):
 #
@@ -36,6 +36,8 @@
 #     from an iptables ruleset if the iptables policy will not allow such
 #     traffic through in the first place).
 #   - New option: --ipt-mark.
+#
+# Reference: Snort is a registered trademark of Sourcefire, Inc
 #
 # Snort Rule Options:
 #
@@ -85,7 +87,7 @@
 #
 ############################################################################
 #
-# $Id: fwsnort 498 2009-05-30 02:39:14Z mbr $
+# $Id: fwsnort 521 2010-01-06 01:36:34Z mbr $
 #
 
 use IO::Socket;
@@ -97,26 +99,12 @@ use Cwd;
 use Getopt::Long;
 use strict;
 
-#======================== config ========================
-my $fwsnort_dir = '/etc/fwsnort';
-my $rules_dir   = "${fwsnort_dir}/snort_rules";
-my $archive_dir = "${fwsnort_dir}/archive";
-my $queue_rules_dir = "${rules_dir}_queue";
-my $log_dir     = '/var/log';
-
 ### config file
-my $fwsnort_conf = "${fwsnort_dir}/fwsnort.conf";
-
-### log file
-my $logfile = "${log_dir}/fwsnort.log";
-
-### iptables script
-my $ipt_script = "${fwsnort_dir}/fwsnort.sh";
-#===================== end config =======================
+my $fwsnort_conf = "/etc/fwsnort/fwsnort.conf";
 
 ### version number
-my $version = '1.0.6';
-my $revision_svn = '$Revision: 498 $';
+my $version = '1.1';
+my $revision_svn = '$Revision: 521 $';
 my $rev_num = '1';
 ($rev_num) = $revision_svn =~ m|\$Rev.*:\s+(\S+)|;
 
@@ -251,7 +239,7 @@ my %snort_opts = (
 
         ### the following fields get logged by iptables but
         ### we cannot filter them directly except with the
-        ### Netfilter u32 module.  Functionality has been built
+        ### iptables u32 module.  Functionality has been built
         ### into psad to generate alerts for most of these Snort
         ### options.
         'id'        => '[\s;]id:\s*(\d+)\s*;',
@@ -283,7 +271,7 @@ my %multi_line_vars = (
 );
 
 ### array that contains iptables script (will be written
-### to $ipt_script)
+### to $config{'FWSNORT_SCRIPT'})
 my @ipt_script_lines = ();
 
 ### contains a cache of the iptables policy
@@ -338,10 +326,17 @@ my $dumper     = 0;
 my $dump_ipt   = 0;
 my $dump_snort = 0;
 my $strict     = 0;
+my $ipt_script = '';
+my $logfile    = '';
+my $rules_dir  = '';
+my $homedir    = '';
+my $run_last   = 0;
+my $queue_rules_dir = '';
 my $dump_conf  = 0;
 my $kernel_ver = '2.6';  ### default
 my $verbose    = 0;
 my $print_ver  = 0;
+my $cmdl_homedir   = '';
 my $update_rules   = 0;  ### used to download latest snort rules
 my $ipt_print_type = 0;
 my $ipt_rule_ctr   = 1;
@@ -374,6 +369,8 @@ my $exclude_re     = '';
 my $include_re     = '';
 my $include_re_caseless = 0;
 my $exclude_re_caseless = 0;
+my $enable_ip6tables  = 0;
+my $ipt_var_str       = 'IPTABLES';
 my $no_ipt_conntrack  = 0;
 my $snort_conf_file   = '';
 my $ipt_restrict_intf = '';
@@ -383,6 +380,8 @@ my $no_exclude_loopback = 0;
 my $no_ipt_log_ip_opts  = 0;
 my $no_ipt_log_tcp_opts = 0;
 my $ipt_log_tcp_seq     = 0;
+my $include_perl_triggers = 0;
+my $duplicate_last_build  = 0;
 
 ### to be added to the string match extension
 my $ipt_has_string_payload_offset_opt = 0;
@@ -402,7 +401,7 @@ my @argv_cp = @ARGV;
 ### make Getopts case sensitive
 Getopt::Long::Configure('no_ignore_case');
 
-die "[-] Use --help for usage information.\n" unless (GetOptions(
+die "[*] Use --help for usage information.\n" unless (GetOptions(
     'ipt-apply'      => \$ipt_apply,    # Apply the generated ruleset.
     'ipt-drop'       => \$ipt_drop,     # Add iptables DROP rules.
     'ipt-reject'     => \$ipt_reject,   # Add iptables REJECT rules.
@@ -414,6 +413,8 @@ die "[-] Use --help for usage information.\n" unless (GetOptions(
     'ipt-list'       => \$ipt_list,     # List any existing fwsnort chains.
     'List'           => \$ipt_list,     # Synonym for --ipt-list
     'ipt-del'        => \$ipt_del_chains, # Delete fwsnort chains.
+    'ip6tables'      => \$enable_ip6tables, # Turn on ip6tables mode.
+    '6'              => \$enable_ip6tables, # Synonym for --ip6tables.
     'X'              => \$ipt_del_chains, # Synonym for --ipt-del.
     'ipt-file=s'     => \$ipt_file,     # Read iptables policy from a file.
     'Home-net=s'     => \$home_net,     # Manually specify home network.
@@ -423,6 +424,8 @@ die "[-] Use --help for usage information.\n" unless (GetOptions(
     'exclude-sid=s'  => \$exclude_sids, # Exclude these particular snort rules.
     'snort-conf=s'   => \$snort_conf_file, # Get HOME_NET, etc. vars from
                                         # existing Snort config file.
+    'include-perl-triggers' => \$include_perl_triggers, # perl commands to
+                                        # trigger signature matches.
     'include-type=s' => \$rules_types,  # Process only this type of snort rule
                                         # (e.g. "ddos")
     'exclude-type=s' => \$exclude_types,# Exclude specified types (e.g. "ddos").
@@ -445,7 +448,7 @@ die "[-] Use --help for usage information.\n" unless (GetOptions(
                                         # iptables.
     'no-ipt-jumps'   => \$no_ipt_jumps, # Don't jump packets from the INPUT or
                                         # FORWARD chains.
-    'no-ipt-conntrack' => \$no_ipt_conntrack, # Don't use Netfilter connection
+    'no-ipt-conntrack' => \$no_ipt_conntrack, # Don't use iptables connection
                                         # tracking (falls back to ACK flag test).
     'no-ipt-INPUT'   => \$no_ipt_input, # Disable fwsnort rules processed via
                                         # the INPUT chain.
@@ -485,6 +488,8 @@ die "[-] Use --help for usage information.\n" unless (GetOptions(
                                               # rules directory in --QUEUE or
                                               # --NFQUEUE mode.
     'queue-num=i'    => \$nfqueue_num,  # Specifies the NFQUEUE number.
+    'Home-dir=s'     => \$cmdl_homedir,
+    'Last-cmd'       => \$run_last,
     'lib-dir=s'      => \$lib_dir,      # Specify path to lib directory.
     'verbose'        => \$verbose,
     'logfile=s'      => \$logfile,      # Specify the logfile path.
@@ -495,8 +500,15 @@ die "[-] Use --help for usage information.\n" unless (GetOptions(
 
 &usage(0) if $help;
 
+my $is_root = 0;
+if ($< == 0 and $> == 0) {
+    $is_root = 1;
+}
+
 ### handle the command line args
 &handle_cmd_line();
+
+&run_last_cmdline() if $run_last;
 
 ### import config, initialize various things, etc.
 &fwsnort_init();
@@ -505,8 +517,7 @@ die "[-] Use --help for usage information.\n" unless (GetOptions(
 ### the current iptables policy
 &cache_ipt_policy() if $ipt_sync;
 
-### truncate old log (does anyone actually use the fwsnort
-### parsing log?)
+### truncate old fwsnort log
 &truncate_logfile();
 
 ### check to make sure iptables has various iptables functionality
@@ -569,26 +580,28 @@ if ($include_sids) {
 
 push @ipt_script_lines, qq|\n\$ECHO "[+] Finished."|, '### EOF ###';
 
-print "\n[+] Logfile: $logfile\n";
+print "\n[+] Logfile: $config{'LOG_FILE'}\n";
 
 if ($ipt_rule_ctr > 1) {
 
     ### archive any existing ipt_script file
-    &archive($ipt_script);
+    &archive($config{'FWSNORT_SCRIPT'});
 
     ### write the iptables script out to disk
     &write_ipt_script();
 
-    chmod 0500, $ipt_script;
+    chmod 0500, $config{'FWSNORT_SCRIPT'};
 
     if ($queue_mode or $nfqueue_mode) {
         print "[+] Snort rule set directory for rules to be queued ",
-            "to userspace:\n    $queue_rules_dir\n";
+            "to userspace:\n    $config{'QUEUE_RULES_DIR'}\n";
     }
-    print "[+] iptables script: $ipt_script\n";
+    print "[+] iptables script: $config{'FWSNORT_SCRIPT'}\n";
 } else {
     print "[-] No Snort rules could be translated.\n";
 }
+
+&save_args() unless $run_last;
 
 exit 0;
 #===================== end main ======================
@@ -602,7 +615,7 @@ sub parse_snort_rules() {
     if ($rules_file) {
         @rfiles = split /\,/, $rules_file;
     } else {
-        for my $dir (split /\,/, $rules_dir) {
+        for my $dir (split /\,/, $config{'RULES_DIR'}) {
             opendir D, $dir or die "[*] Could not opendir $dir";
             for my $file (readdir D) {
                 push @rfiles, "$dir/$file";
@@ -766,7 +779,7 @@ sub parse_snort_rules() {
             }
 
             ### construct the equivalent iptables rule and add it
-            ### to $ipt_script
+            ### to $config{'FWSNORT_SCRIPT'}
             my ($ipt_rv, $num_rules) = &ipt_build($hdr_hr,
                     $opts_hr, $content_ar, $offsets_hr, $rule);
 
@@ -788,8 +801,8 @@ sub parse_snort_rules() {
         }
 
         if (($queue_mode or $nfqueue_mode) and @queue_rules) {
-            open M, "> $queue_rules_dir/$filename" or die "[*] Could not ",
-                "open $queue_rules_dir/$filename: $!";
+            open M, "> $config{'QUEUE_RULES_DIR'}/$filename" or die "[*] Could not ",
+                "open $config{'QUEUE_RULES_DIR'}/$filename: $!";
             print M "#\n### This file generated with: fwsnort @argv_cp\n#\n\n";
             print M "$_\n", for @queue_rules;
             print M "\n### EOF ###\n";
@@ -1060,7 +1073,7 @@ sub parse_rule_hdr() {
             'dport'  => $dport,
         );
 
-        ### map to exapanded values (e.g. $HOME -> "any" or whatever
+        ### map to expanded values (e.g. $HOME -> "any" or whatever
         ### is defined in fwsnort.conf)
         for my $var qw(src sport dst dport) {
             my $val = $hsh{$var};
@@ -1070,6 +1083,11 @@ sub parse_rule_hdr() {
                 $val = $1;
                 if (defined $config{$val}) {
                     $val = $config{$val};
+                    if ($enable_ip6tables and $val =~ /\b$ip_re\b/) {
+                        &logr("[-] --ip6tables mode enabled but IPv4 " .
+                            "address in rule variable at line: $line_num.");
+                        return {};
+                    }
                 } else {
                     &logr("[-] Undefined variable $val in rule header " .
                         "at line: $line_num.");
@@ -1574,6 +1592,7 @@ sub ipt_build() {
     }
 
     my $add_snort_comment = 1;
+    my $add_perl_trigger  = 1;
     for my $chain (keys %process_chains) {
 
         next unless $process_chains{$chain} and $process_rules{$chain};
@@ -1581,7 +1600,7 @@ sub ipt_build() {
         ### build iptables INPUT rules
         for my $src_dst (@{$process_rules{$chain}}) {
 
-            my $rule = "\$IPTABLES -A ";
+            my $rule = "\$${ipt_var_str} -A ";
 
             ### see if we can jump to the ESTABLISHED inspection chain.
             if ($flow_established) {
@@ -1628,11 +1647,13 @@ sub ipt_build() {
                 $offsets_hr,
                 $orig_snort_rule,
                 $flow_established,
-                $add_snort_comment
+                $add_snort_comment,
+                $add_perl_trigger
             );
             if ($rv) {
                 $found_rule        = 1;
                 $add_snort_comment = 0;
+                $add_perl_trigger  = 0;
                 $num_rules++;
             }
         }
@@ -1692,7 +1713,7 @@ sub get_local_addrs() {
 sub ipt_build_rule() {
     my ($chain, $rule, $hdr_hr, $opts_hr, $content_ar,
             $offsets_hr, $orig_snort_rule, $flow_logging_prefix,
-            $add_snort_comment) = @_;
+            $add_snort_comment, $add_perl_trigger) = @_;
 
     ### $chain is used only to see whether or not we need to add the
     ### rule to the iptables script based on whether the built-in chain
@@ -1714,7 +1735,7 @@ sub ipt_build_rule() {
                 and $hdr_hr->{'dport'} ne ''))
                 and $hdr_hr->{'proto'} !~ /tcp/i
                 and $hdr_hr->{'proto'} !~ /udp/i) {
-            ### force to tcp because Netfiler does not like src/dst
+            ### force to tcp because iptables does not like src/dst
             ### ports with anything other than tcp or udp
             $hdr_hr->{'proto'} = 'tcp';
         }
@@ -1741,7 +1762,7 @@ sub ipt_build_rule() {
 
     my $rv = &ipt_build_opts($rule, $hdr_hr, $opts_hr, $content_ar,
         $offsets_hr, $orig_snort_rule, $flow_logging_prefix,
-        $chain, $add_snort_comment);
+        $chain, $add_snort_comment, $add_perl_trigger);
 
     return $rv;
 }
@@ -1749,7 +1770,7 @@ sub ipt_build_rule() {
 sub ipt_build_opts() {
     my ($rule, $hdr_hr, $opts_hr, $content_ar,
             $offsets_hr, $orig_snort_rule, $flow_logging_prefix,
-            $chain, $add_snort_comment) = @_;
+            $chain, $add_snort_comment, $add_perl_trigger) = @_;
 
     ### append tcp flags
     if (defined $opts_hr->{'flags'}) {
@@ -1847,31 +1868,32 @@ sub ipt_build_opts() {
         ### (the iptables length match applies to the network header
         ### and up).
         if ($opts_hr->{'dsize'} =~ m|(\d+)\s*<>\s*(\d+)|) {
-            my $netfilter_len1 = $1 + $avg_hdr_len;
-            my $netfilter_len2 = $2 + $avg_hdr_len;
+            my $iptables_len1 = $1 + $avg_hdr_len;
+            my $iptables_len2 = $2 + $avg_hdr_len;
             $rule .= " $snort_opts{'filter'}{'dsize'}{'iptopt'} " .
-                "$netfilter_len1:$netfilter_len2";
+                "$iptables_len1:$iptables_len2";
         } elsif ($opts_hr->{'dsize'} =~ m|<\s*(\d+)|) {
-            my $netfilter_len = $1 + $avg_hdr_len;
+            my $iptables_len = $1 + $avg_hdr_len;
             $rule .= " $snort_opts{'filter'}{'dsize'}{'iptopt'} " .
-                "$avg_hdr_len:$netfilter_len";
+                "$avg_hdr_len:$iptables_len";
         } elsif ($opts_hr->{'dsize'} =~ m|>\s*(\d+)|) {
-            my $netfilter_len = $1 + $avg_hdr_len;
-            if ($netfilter_len < $config{'MAX_FRAME_LEN'} + $avg_hdr_len) {
+            my $iptables_len = $1 + $avg_hdr_len;
+            if ($iptables_len < $config{'MAX_FRAME_LEN'} + $avg_hdr_len) {
                 $rule .= " $snort_opts{'filter'}{'dsize'}{'iptopt'} " .
-                    "$netfilter_len:" .
+                    "$iptables_len:" .
                     ($config{'MAX_FRAME_LEN'} + $avg_hdr_len);
             }
         } elsif ($opts_hr->{'dsize'} =~ m|(\d+)|) {
-            my $netfilter_len = $1 + $avg_hdr_len;
+            my $iptables_len = $1 + $avg_hdr_len;
             $rule .= " $snort_opts{'filter'}{'dsize'}{'iptopt'} " .
-                $netfilter_len;
+                $iptables_len;
         }
     }
 
     ### append snort content options
-    my $ipt_content_criteria = &build_content_matches($opts_hr,
-            $content_ar, $offsets_hr, $avg_hdr_len);
+    my ($ipt_content_criteria, $perl_trigger_str)
+        = &build_content_matches($opts_hr, $content_ar, $offsets_hr,
+                $avg_hdr_len);
 
     return 0 unless $ipt_content_criteria;
     $rule .= $ipt_content_criteria;
@@ -1955,7 +1977,8 @@ sub ipt_build_opts() {
 
     ### write the rule out to the iptables script
     &ipt_add_rule($hdr_hr, $opts_hr, $orig_snort_rule,
-        $rule, $target_str, "### $comment", $add_snort_comment);
+        $rule, $target_str, "### $comment", $add_snort_comment,
+        $perl_trigger_str, $add_perl_trigger);
     return 1;
 }
 
@@ -1963,6 +1986,9 @@ sub build_content_matches() {
     my ($opts_hr, $content_ar, $offsets_hr, $avg_hdr_len) = @_;
 
     my $ipt_content_criteria = '';
+    my $perl_trigger_command = '';
+
+    $perl_trigger_command = q|perl -e 'print "| if $include_perl_triggers;
 
     for (my $i=0; $i <= $#$content_ar; $i++) {
 
@@ -1975,6 +2001,7 @@ sub build_content_matches() {
         }
 
         $content_str =~ s/`/|60|/g;     ### ` -> |60|
+        $content_str =~ s/'/|27|/g;     ### ' -> |27|
         $content_str =~ s/\x24/|24|/g;  ### $ -> |24|
 
         ### convert all escaped chars to their hex equivalents
@@ -2014,6 +2041,7 @@ sub build_content_matches() {
                     qq{--hex-string "$content_str"};
             }
         } else {
+            ### there is no hex data in the content
             if ($neg_match) {
                 $ipt_content_criteria .= ' ' . $snort_opts{'filter'}
                     {'content'}{'iptopt'} . ' ' .
@@ -2075,6 +2103,9 @@ sub build_content_matches() {
                 if ($offset > -1) {
                     $ipt_content_criteria .= ' ' . $snort_opts{'filter'}
                         {'offset'}{'iptopt'} . " $offset";
+                    $perl_trigger_command .= 'A'x$offset
+                        if $include_perl_triggers;
+
                 } elsif ($distance > -1) {  ### offset always trumps distance
                     ### see if we need to increase the distance based on the
                     ### length of the previous pattern match and offset
@@ -2089,6 +2120,9 @@ sub build_content_matches() {
                     $ipt_content_criteria .= ' ' . $snort_opts{'filter'}
                         {'distance'}{'iptopt'} . " $distance";
                     $offset = $distance;
+
+                    $perl_trigger_command .= 'A'x$distance
+                        if $include_perl_triggers;
                 }
                 if ($depth > -1) {
                     ### make sure there is room for the pattern
@@ -2098,6 +2132,10 @@ sub build_content_matches() {
 
                     $ipt_content_criteria .= ' ' . $snort_opts{'filter'}
                         {'depth'}{'iptopt'} . " $depth";
+
+                    $perl_trigger_command .= 'A'x$depth
+                        if $include_perl_triggers;
+
                 } elsif ($within > -1) {  ### depth trumps within
                     ### the minimum within value must allow room for
                     ### the current pattern as well as the previous one
@@ -2109,6 +2147,9 @@ sub build_content_matches() {
                     $within = $min_within if $within < $min_within;
                     $ipt_content_criteria .= ' ' . $snort_opts{'filter'}
                         {'within'}{'iptopt'} . " $within";
+
+                    $perl_trigger_command .= 'A'x$within
+                        if $include_perl_triggers;
                 }
 
                 ### if the --payload option is available for
@@ -2117,9 +2158,22 @@ sub build_content_matches() {
                     if $ipt_has_string_payload_offset_opt;
             }
         }
+
+        if ($include_perl_triggers) {
+            ### now append the perl trigger command bytes
+            if ($neg_match) {
+                $perl_trigger_command .= 'A'x(&get_content_len($content_str));
+            } else {
+                $perl_trigger_command .= &translate_perl_trigger($content_str);
+            }
+        }
     }
 
-    return $ipt_content_criteria;
+    if ($include_perl_triggers) {
+        $perl_trigger_command .= qq|"'|;
+    }
+
+    return $ipt_content_criteria, $perl_trigger_command;
 }
 
 sub get_content_len() {
@@ -2160,9 +2214,56 @@ sub consolidate_hex_spaces() {
     return $new_str;
 }
 
+sub translate_perl_trigger() {
+    my $str = shift;
+    my $trigger_str = '';
+    my $hex_mode = 0;
+    my $append_hex_str = '';
+    my $append_non_hex_str = '';
+
+    my @chars = split //, $str;
+
+    for my $char (@chars) {
+        if ($char eq '|') {
+            if ($hex_mode) {
+                if ($append_hex_str) {
+                    while ($append_hex_str =~ /(.{2})/g) {
+                        $trigger_str .= "\\x$1";
+                    }
+                    $append_hex_str = '';
+                }
+                $hex_mode = 0;
+            } else {
+                if ($append_non_hex_str) {
+                    $trigger_str .= qq|$append_non_hex_str|;
+                    $append_non_hex_str = '';
+                }
+                $hex_mode = 1;
+            }
+            next;
+        }
+
+        if ($hex_mode) {
+            $append_hex_str .= $char;
+        } else {
+            $append_non_hex_str .= $char;
+        }
+    }
+
+    if ($append_hex_str) {
+        while ($append_hex_str =~ /(.{2})/g) {
+            $trigger_str .= "\\x$1";
+        }
+    }
+    $trigger_str .= qq|$append_non_hex_str| if $append_non_hex_str;
+
+    return $trigger_str;
+}
+
 sub ipt_add_rule() {
     my ($hdr_hr, $opts_hr, $orig_snort_rule, $rule_base,
-        $target_str, $comment, $add_snort_comment) = @_;
+        $target_str, $comment, $add_snort_comment,
+        $perl_trigger_str, $add_perl_trigger) = @_;
 
     my $action_rule = '';
     if ($hdr_hr->{'proto'} eq 'tcp') {
@@ -2219,6 +2320,9 @@ sub ipt_add_rule() {
     my $ipt_rule = $rule_base . $target_str;
 
     push @ipt_script_lines, "\n### $orig_snort_rule" if $add_snort_comment;
+    if ($include_perl_triggers and $add_perl_trigger) {
+        push @ipt_script_lines, "### $perl_trigger_str";
+    }
     if ($verbose) {
         push @ipt_script_lines, qq|\$ECHO "[+] rule $ipt_rule_ctr"|;
     }
@@ -2255,11 +2359,11 @@ sub ipt_whitelist() {
             next unless $process_chains{$chain};
 
             if ($chain eq 'INPUT' or $chain eq 'FORWARD') {
-                push @ipt_script_lines, "\$IPTABLES -A " .
+                push @ipt_script_lines, "\$${ipt_var_str} -A " .
                     qq|$config{"FWSNORT_$chain"} -s $addr -j RETURN|;
             }
             if ($chain eq 'OUTPUT' or $chain eq 'FORWARD') {
-                push @ipt_script_lines, "\$IPTABLES -A " .
+                push @ipt_script_lines, "\$${ipt_var_str} -A " .
                     qq|$config{"FWSNORT_$chain"} -d $addr -j RETURN|;
             }
         }
@@ -2298,33 +2402,33 @@ sub ipt_blacklist() {
 
                 if ($target eq 'DROP') {
                     if ($chain eq 'INPUT' or $chain eq 'FORWARD') {
-                        push @ipt_script_lines, "\$IPTABLES -A " .
+                        push @ipt_script_lines, "\$${ipt_var_str} -A " .
                             qq|$config{"FWSNORT_$chain"} -s $addr -j DROP|;
                     }
                     if ($chain eq 'OUTPUT' or $chain eq 'FORWARD') {
-                        push @ipt_script_lines, "\$IPTABLES -A " .
+                        push @ipt_script_lines, "\$${ipt_var_str} -A " .
                             qq|$config{"FWSNORT_$chain"} -d $addr -j DROP|;
                     }
                 } else {
                     if ($chain eq 'INPUT' or $chain eq 'FORWARD') {
-                        push @ipt_script_lines, "\$IPTABLES -A " .
+                        push @ipt_script_lines, "\$${ipt_var_str} -A " .
                             qq|$config{"FWSNORT_$chain"} -s $addr -p tcp | .
                             qq|-j REJECT --reject-with tcp-reset|;
-                        push @ipt_script_lines, "\$IPTABLES -A " .
+                        push @ipt_script_lines, "\$${ipt_var_str} -A " .
                             qq|$config{"FWSNORT_$chain"} -s $addr -p udp | .
                             qq|-j REJECT --reject-with icmp-port-unreachable|;
-                        push @ipt_script_lines, "\$IPTABLES -A " .
+                        push @ipt_script_lines, "\$${ipt_var_str} -A " .
                             qq|$config{"FWSNORT_$chain"} -s $addr -p icmp | .
                             qq|-j REJECT --reject-with icmp-host-unreachable|;
                     }
                     if ($chain eq 'OUTPUT' or $chain eq 'FORWARD') {
-                        push @ipt_script_lines, "\$IPTABLES -A " .
+                        push @ipt_script_lines, "\$${ipt_var_str} -A " .
                             qq|$config{"FWSNORT_$chain"} -d $addr -p tcp | .
                             qq|-j REJECT --reject-with tcp-reset|;
-                        push @ipt_script_lines, "\$IPTABLES -A " .
+                        push @ipt_script_lines, "\$${ipt_var_str} -A " .
                             qq|$config{"FWSNORT_$chain"} -d $addr -p udp | .
                             qq|-j REJECT --reject-with icmp-port-unreachable|;
-                        push @ipt_script_lines, "\$IPTABLES -A " .
+                        push @ipt_script_lines, "\$${ipt_var_str} -A " .
                             qq|$config{"FWSNORT_$chain"} -d $addr -p icmp | .
                             qq|-j REJECT --reject-with icmp-host-unreachable|;
                     }
@@ -2349,8 +2453,8 @@ sub ipt_add_chains() {
                     $config{"FWSNORT_${built_in_chain}_ESTAB"};
             }
             push @ipt_script_lines,
-                "\$IPTABLES -N $chain 2> /dev/null",
-                "\$IPTABLES -F $chain\n";
+                "\$${ipt_var_str} -N $chain 2> /dev/null",
+                "\$${ipt_var_str} -F $chain\n";
         }
     }
     return;
@@ -2365,7 +2469,7 @@ sub ipt_add_conntrack_jumps() {
     for my $chain (keys %process_chains) {
         next unless $process_chains{$chain};
 
-        push @ipt_script_lines, qq|\$IPTABLES -A $config{"FWSNORT_$chain"} | .
+        push @ipt_script_lines, qq|\$${ipt_var_str} -A $config{"FWSNORT_$chain"} | .
             "-p tcp -m state --state ESTABLISHED -j " .
             $config{"FWSNORT_${chain}_ESTAB"};
     }
@@ -2384,21 +2488,21 @@ sub ipt_jump_chain() {
                     ### delete any existing jump rule so that fwsnort.sh can
                     ### be executed many times in a row without adding several
                     ### jump rules
-                    push @ipt_script_lines, "\$IPTABLES -D $chain " .
+                    push @ipt_script_lines, "\$${ipt_var_str} -D $chain " .
                         qq|-i $intf -j $config{"FWSNORT_$chain"}| .
                         ' 2> /dev/null';
 
                     ### now add the jump rule
-                    push @ipt_script_lines, "\$IPTABLES -I $chain " .
+                    push @ipt_script_lines, "\$${ipt_var_str} -I $chain " .
                         qq|$config{"FWSNORT_${chain}_JUMP"} -i | .
                         qq|$intf -j $config{"FWSNORT_$chain"}|;
                 } elsif ($chain eq 'OUTPUT') {
 
-                    push @ipt_script_lines, "\$IPTABLES -D $chain " .
+                    push @ipt_script_lines, "\$${ipt_var_str} -D $chain " .
                         qq|-o $intf -j $config{'FWSNORT_OUTPUT'}| .
                         ' 2> /dev/null';
 
-                    push @ipt_script_lines, "\$IPTABLES -I $chain " .
+                    push @ipt_script_lines, "\$${ipt_var_str} -I $chain " .
                         qq|$config{'FWSNORT_OUTPUT_JUMP'} -o | .
                         qq|$intf -j $config{'FWSNORT_OUTPUT'}|;
                 }
@@ -2410,31 +2514,31 @@ sub ipt_jump_chain() {
 
             if ($no_exclude_loopback) {
 
-                push @ipt_script_lines, "\$IPTABLES -D $chain " .
+                push @ipt_script_lines, "\$${ipt_var_str} -D $chain " .
                     qq|-j $config{"FWSNORT_$chain"}| .
                     ' 2> /dev/null';
 
-                push @ipt_script_lines, "\$IPTABLES -I $chain " .
+                push @ipt_script_lines, "\$${ipt_var_str} -I $chain " .
                     qq|$config{"FWSNORT_${chain}_JUMP"} | .
                     qq|-j $config{"FWSNORT_$chain"}|;
             } else {
                 if ($chain eq 'INPUT' or $chain eq 'FORWARD') {
 
-                    push @ipt_script_lines, "\$IPTABLES -D $chain " .
+                    push @ipt_script_lines, "\$${ipt_var_str} -D $chain " .
                         qq|! -i lo -j $config{"FWSNORT_$chain"}| .
                         ' 2> /dev/null';
 
-                    push @ipt_script_lines, "\$IPTABLES -I $chain " .
+                    push @ipt_script_lines, "\$${ipt_var_str} -I $chain " .
                         qq|$config{"FWSNORT_${chain}_JUMP"} ! -i lo | .
                         qq|-j $config{"FWSNORT_$chain"}|;
 
                 } elsif ($chain eq 'OUTPUT') {
 
-                    push @ipt_script_lines, "\$IPTABLES -D $chain " .
+                    push @ipt_script_lines, "\$${ipt_var_str} -D $chain " .
                         qq|! -o lo -j $config{"FWSNORT_$chain"}| .
                         ' 2> /dev/null';
 
-                    push @ipt_script_lines, "\$IPTABLES -I $chain " .
+                    push @ipt_script_lines, "\$${ipt_var_str} -I $chain " .
                         qq|$config{"FWSNORT_${chain}_JUMP"} ! -o lo | .
                         qq|-j $config{"FWSNORT_$chain"}|;
                 }
@@ -2447,7 +2551,7 @@ sub ipt_jump_chain() {
 sub ipt_hdr() {
     push @ipt_script_lines,
         "#!$cmds{'sh'}\n#", '#'x76,
-        "#\n# File:  $ipt_script",
+        "#\n# File:  $config{'FWSNORT_SCRIPT'}",
         "#\n# Purpose:  This script was auto-" .
         "generated by fwsnort, and implements",
         "#           an iptables ruleset based upon " .
@@ -2470,10 +2574,14 @@ sub ipt_hdr() {
 
 sub ipt_config_section() {
     ### build the config section of the iptables script
+    my $ipt_cmd = $cmds{'iptables'};
+    if ($enable_ip6tables) {
+        $ipt_cmd = $cmds{'ip6tables'};
+    }
     push @ipt_script_lines,
         '#==================== config ====================',
         "ECHO=$cmds{'echo'}",
-        "IPTABLES=$cmds{'iptables'}",
+        "${ipt_var_str}=$ipt_cmd",
         "#================== end config ==================\n";
     return;
 }
@@ -2490,7 +2598,7 @@ sub check_type() {
         for my $type (keys %$type_hr) {
             my $found = 0;
             my @valid_types = ();
-            for my $dir (split /\,/, $rules_dir) {
+            for my $dir (split /\,/, $config{'RULES_DIR'}) {
                 if (-e "$dir/${type}.rules") {
                     $found = 1;
                 } else {
@@ -2516,7 +2624,7 @@ sub check_type() {
 }
 
 sub import_config() {
-    open C, "< $fwsnort_conf" or die $!;
+    open C, "< $fwsnort_conf" or die "[*] Could not open $fwsnort_conf: $!";
     my @lines = <C>;
     close C;
     my $l_ctr = 0;
@@ -2542,6 +2650,9 @@ sub import_config() {
             }
         }
     }
+
+    &expand_vars();
+
     return;
 }
 
@@ -2661,6 +2772,14 @@ sub fwsnort_init() {
 
     &get_local_addrs() unless $no_addr_check;
 
+    if ($enable_ip6tables) {
+        for my $opt qw/itype icode ttl tos ipopts/ {
+            $snort_opts{'unsupported'}{$opt}
+                = $snort_opts{'filter'}{$opt};
+            delete $snort_opts{'filter'}{$opt};
+        }
+    }
+
     if ($strict) {
         ### make the snort options parser very strict
         for my $opt qw/uricontent pcre distance within/ {
@@ -2706,6 +2825,8 @@ sub get_kernel_ver() {
 
 sub handle_cmd_line() {
 
+    &get_homedir();
+
     ### Print the version number and exit if -V given on the command line.
     if ($print_ver) {
         print "[+] fwsnort v$version (file revision: $rev_num)\n",
@@ -2741,17 +2862,32 @@ sub handle_cmd_line() {
         die "[*] Cannot specify both --ipt-drop and --ipt-reject";
     }
 
+    unless ($is_root) {
+        $no_ipt_sync = 1;
+        $no_ipt_test = 1;
+        $config{'LOG_FILE'} = './fwsnort.log';  ### local file
+        unlink $config{'LOG_FILE'} if -e $config{'LOG_FILE'};
+        $config{'FWSNORT_SCRIPT'} = './fwsnort.sh';  ### local file
+        unlink $config{'FWSNORT_SCRIPT'} if -e $config{'FWSNORT_SCRIPT'};
+    }
+
     if ($ipt_apply) {
-        if (-e $ipt_script) {
-            print "[+] Executing $ipt_script\n";
-            system $ipt_script;
+        die "[*] You need to be root for --ipt-apply" unless $is_root;
+        if (-e $config{'FWSNORT_SCRIPT'}) {
+            print "[+] Executing $config{'FWSNORT_SCRIPT'}\n";
+            system $config{'FWSNORT_SCRIPT'};
             exit 0;
         } else {
-            die "[*] $ipt_script does not exist.";
+            die "[*] $config{'FWSNORT_SCRIPT'} does not exist.";
         }
     }
 
     $ipt_sync = 0 if $no_ipt_sync;
+
+    if ($enable_ip6tables) {
+        ### switch to ip6tables
+        $ipt_var_str = 'IP6TABLES';
+    }
 
     $process_chains{'INPUT'}   = 0 if $no_ipt_input;
     $process_chains{'FORWARD'} = 0 if $no_ipt_forward;
@@ -2831,6 +2967,39 @@ sub import_snort_conf() {
     return;
 }
 
+sub expand_vars() {
+
+    my $has_sub_var = 1;
+    my $resolve_ctr = 0;
+
+    while ($has_sub_var) {
+        $resolve_ctr++;
+        $has_sub_var = 0;
+        if ($resolve_ctr >= 20) {
+            die "[*] Exceeded maximum variable resolution counter.";
+        }
+        for my $hr (\%config, \%cmds) {
+            for my $var (keys %$hr) {
+                my $val = $hr->{$var};
+                if ($val =~ m|\$(\w+)|) {
+                    my $sub_var = $1;
+                    die "[*] sub-ver $sub_var not allowed within same ",
+                        "variable $var" if $sub_var eq $var;
+                    if (defined $config{$sub_var}) {
+                        $val =~ s|\$$sub_var|$config{$sub_var}|;
+                        $hr->{$var} = $val;
+                    } else {
+                        die "[*] sub-var \"$sub_var\" not defined in ",
+                            "config for var: $var.";
+                    }
+                    $has_sub_var = 1;
+                }
+            }
+        }
+    }
+    return;
+}
+
 sub required_vars() {
     my @required_vars = qw(
         HOME_NET EXTERNAL_NET HTTP_SERVERS SMTP_SERVERS DNS_SERVERS
@@ -2839,7 +3008,8 @@ sub required_vars() {
         AVG_TCP_HEADER_LEN MAX_FRAME_LEN FWSNORT_INPUT FWSNORT_INPUT_ESTAB
         FWSNORT_OUTPUT FWSNORT_OUTPUT_ESTAB FWSNORT_FORWARD
         FWSNORT_FORWARD_ESTAB FWSNORT_INPUT_JUMP FWSNORT_OUTPUT_JUMP
-        FWSNORT_FORWARD_JUMP FWSNORT_LIBS_DIR MAX_STRING_LEN
+        FWSNORT_FORWARD_JUMP MAX_STRING_LEN CONF_DIR RULES_DIR ARCHIVE_DIR
+        QUEUE_RULES_DIR LOG_DIR LIBS_DIR CONF_FILE FWSNORT_SCRIPT LOG_FILE
     );
     for my $var (@required_vars) {
         die "[*] Variable $var not defined in $fwsnort_conf. Exiting.\n"
@@ -2877,7 +3047,7 @@ sub ipt_test() {
     unless (&ipt_rule_test("-I INPUT 1 -p icmp -m " .
         "ipv4options --rr -s $NON_HOST -j LOG") == $IPT_SUCCESS) {
 
-        &logr("[-] Netfilter ipv4options extension not available, " .
+        &logr("[-] iptables ipv4options extension not available, " .
             "disabling ipopts translation.");
         ### put ipopts in the unsupported list
         if (defined $snort_opts{'filter'}{'ipopts'}) {
@@ -2893,7 +3063,7 @@ sub ipt_test() {
     unless (&ipt_rule_test("-I INPUT 1 -p icmp -s $NON_HOST " .
             "-m ttl --ttl-eq 1 -j LOG") == $IPT_SUCCESS) {
         ### put ttl in the unsupported list
-        &logr("[-] Netfilter TTL match not available, " .
+        &logr("[-] iptables TTL match not available, " .
             "disabling ttl translation.");
         if (defined $snort_opts{'filter'}{'ttl'}) {
             $snort_opts{'unsupported'}{'ttl'} =
@@ -2908,7 +3078,7 @@ sub ipt_test() {
     unless (&ipt_rule_test("-I INPUT 1 -p icmp -s $NON_HOST " .
             "-m tos --tos 8 -j LOG") == $IPT_SUCCESS) {
         ### put tos in the unsupported list
-        &logr("[-] Netfilter TOS match not available, " .
+        &logr("[-] iptables TOS match not available, " .
             "disabling tos translation.");
         if (defined $snort_opts{'filter'}{'tos'}) {
             $snort_opts{'unsupported'}{'tos'} =
@@ -2924,7 +3094,7 @@ sub ipt_test() {
             "-m length --length 256 -j LOG") == $IPT_SUCCESS) {
 
         ### put length in the unsupported list
-        &logr("[-] Netfilter length match not available, " .
+        &logr("[-] iptables length match not available, " .
             "disabling length translation.");
         if (defined $snort_opts{'filter'}{'dsize'}) {
             $snort_opts{'unsupported'}{'dsize'} =
@@ -3004,7 +3174,7 @@ sub ipt_test() {
                 "--dport 3001 -m state --state ESTABLISHED -j LOG")
                 == $IPT_SUCCESS) {
         die
-"[*] It does not appear that Netfilter has been compiled with connection\n",
+"[*] It does not appear that iptables has been compiled with connection\n",
 "    tracking support.  If you want fwsnort to generate a policy anyway\n",
 "    and just use a tcp flags check for established tcp connections, then\n",
 "    use the --no-ipt-conntrack option.  **NOTE: The resulting fwsnort\n",
@@ -3068,29 +3238,29 @@ sub get_mod_paths() {
 
     my @paths = ();
 
-    $config{'FWSNORT_LIBS_DIR'} = $lib_dir if $lib_dir;
+    $config{'LIBS_DIR'} = $lib_dir if $lib_dir;
 
-    unless (-d $config{'FWSNORT_LIBS_DIR'}) {
-        my $dir_tmp = $config{'FWSNORT_LIBS_DIR'};
+    unless (-d $config{'LIBS_DIR'}) {
+        my $dir_tmp = $config{'LIBS_DIR'};
         $dir_tmp =~ s|lib/|lib64/|;
         if (-d $dir_tmp) {
-            $config{'FWSNORT_LIBS_DIR'} = $dir_tmp;
+            $config{'LIBS_DIR'} = $dir_tmp;
         } else {
             return [];
         }
     }
 
-    opendir D, $config{'FWSNORT_LIBS_DIR'}
-        or die "[*] Could not open $config{'FWSNORT_LIBS_DIR'}: $!";
+    opendir D, $config{'LIBS_DIR'}
+        or die "[*] Could not open $config{'LIBS_DIR'}: $!";
     my @dirs = readdir D;
     closedir D;
 
-    push @paths, $config{'FWSNORT_LIBS_DIR'};
+    push @paths, $config{'LIBS_DIR'};
 
     for my $dir (@dirs) {
         ### get directories like "/usr/lib/fwsnort/x86_64-linux"
-        next unless -d "$config{'FWSNORT_LIBS_DIR'}/$dir";
-        push @paths, "$config{'FWSNORT_LIBS_DIR'}/$dir"
+        next unless -d "$config{'LIBS_DIR'}/$dir";
+        push @paths, "$config{'LIBS_DIR'}/$dir"
             if $dir =~ m|linux| or $dir =~ m|thread|;
     }
     return \@paths;
@@ -3100,15 +3270,20 @@ sub setup() {
 
     ### these two directories must already exist for
     ### things to work
-    die "[*] No fwsnort directory $fwsnort_dir"
-        unless -d $fwsnort_dir;
+    die "[*] No fwsnort directory $config{'CONF_DIR'}"
+        unless -d $config{'CONF_DIR'};
+
+    $config{'FWSNORT_SCRIPT'}  = $ipt_script if $ipt_script;
+    $config{'RULES_DIR'}       = $rules_dir if $rules_dir;
+    $config{'QUEUE_RULES_DIR'} = $queue_rules_dir if $queue_rules_dir;
+    $config{'LOG_FILE'}        = $logfile if $logfile;
 
     if ($rules_file) {
         for my $file (split /\,/, $rules_file) {
             die "[*] Snort rules file $file does not exist." unless -e $file;
         }
     } else {
-        for my $dir (split /\,/, $rules_dir) {
+        for my $dir (split /\,/, $config{'RULES_DIR'}) {
             die "[*] No snort rules directory $dir, use --snort-rdir"
                 unless -d $dir;
         }
@@ -3117,16 +3292,20 @@ sub setup() {
     ### import fwsnort perl modules
     &import_perl_modules();
 
-    unless (-d $archive_dir) {
-        mkdir $archive_dir, 0500 or die $!;
+    if ($is_root) {
+        unless (-d $config{'ARCHIVE_DIR'}) {
+            mkdir $config{'ARCHIVE_DIR'}, 0500 or
+                die "[*] Could not mkdir($config{'ARCHIVE_DIR'}): $!";
+        }
+
+        unless (-d $config{'LOG_DIR'}) {
+            mkdir $config{'LOG_DIR'}, 0755 or
+                die "[*] Could not mkdir($config{'LOG_DIR'}): $!";
+        }
     }
 
-    unless (-d $log_dir) {
-        mkdir $log_dir, 0755 or die $!;
-    }
-
-    if (($queue_mode or $nfqueue_mode) and not -d $queue_rules_dir) {
-        mkdir $queue_rules_dir, 0500 or die $!;
+    if (($queue_mode or $nfqueue_mode) and not -d $config{'QUEUE_RULES_DIR'}) {
+        mkdir $config{'QUEUE_RULES_DIR'}, 0500 or die $!;
     }
 
     return;
@@ -3134,8 +3313,8 @@ sub setup() {
 
 sub update_rules() {
     my $url = 'http://www.emergingthreats.net/rules/emerging-all.rules';
-    print "[+] Downloading latest rules into $rules_dir/\n    $url\n";
-    my $dir = $rules_dir;
+    print "[+] Downloading latest rules into $config{'RULES_DIR'}/\n    $url\n";
+    my $dir = $config{'RULES_DIR'};
     $dir =~ s/\,.*//;
     chdir $dir or die "[*] Could not chdir $dir: $!";
     if (-e 'emerging-all.rules') {
@@ -3212,7 +3391,7 @@ sub archive() {
     my $file = shift;
     return unless $file =~ m|/|;
     my ($filename) = ($file =~ m|.*/(.*)|);
-    my $targetbase = "${archive_dir}/${filename}.old";
+    my $targetbase = "$config{'ARCHIVE_DIR'}/${filename}.old";
     for (my $i = 4; $i > 1; $i--) {  ### keep five copies of the old config files
         my $oldfile = $targetbase . $i;
         my $newfile = $targetbase . ($i+1);
@@ -3230,7 +3409,8 @@ sub archive() {
 }
 
 sub write_ipt_script() {
-    open F, "> $ipt_script" or die "[*] Could not open $ipt_script: $!";
+    open F, "> $config{'FWSNORT_SCRIPT'}" or
+        die "[*] Could not open $config{'FWSNORT_SCRIPT'}: $!";
     print F "$_\n" for @ipt_script_lines;
     close F;
     return;
@@ -3258,8 +3438,69 @@ sub expand_addresses() {
     return \@addrs;
 }
 
+sub run_last_cmdline() {
+
+    my $save_file = "$homedir/.fwsnort.run";
+
+    open S, "< $save_file" or die "[*] Could not open $save_file: $!";
+    my $arg_line = <S>;
+    close S;
+    chomp $arg_line;
+
+    print "[+] Running with last command line args: $arg_line\n";
+
+    @ARGV = split /\s+/, $arg_line;
+    @argv_cp = @ARGV;
+
+    ### run GetOpt() to get command line args
+    &handle_cmd_line();
+
+    return;
+}
+
+sub save_args() {
+    my $save_file  = "$homedir/.fwsnort.run";
+
+    open S, "> $save_file" or die "[*] Could not open $save_file";
+    print S "@argv_cp\n";
+    close S;
+
+    return;
+}
+
+sub get_homedir() {
+    my $uid = $<;
+    if ($cmdl_homedir) {
+        $homedir = $cmdl_homedir;
+    } else {
+        ### prefer homedir specified in /etc/passwd (if it exists)
+        if (-e '/etc/passwd') {
+            open P, "< /etc/passwd" or die "[*] Could not open /etc/passwd. ",
+                "Exiting.\n";
+            my @lines = <P>;
+            close P;
+            for my $line (@lines) {
+                ### mbr:x:222:222:Michael Rash:/home/mbr:/bin/bash
+                chomp $line;
+                if ($line =~ /^(?:.*:){2}$uid:(?:.*:){2}(\S+):/) {
+                    $homedir = $1;
+                    last;
+                }
+            }
+        }
+        unless ($homedir and -d $homedir) {
+            $homedir = $ENV{'HOME'} if defined $ENV{'HOME'};
+        }
+    }
+    die '[*] Could not determine homedir, use --Home option.'
+        unless ($homedir and -d $homedir);
+
+    return;
+}
+
 sub truncate_logfile() {
-    open L, "> $logfile" or die "[*] Could not open $logfile: $!";
+    open L, "> $config{'LOG_FILE'}" or
+        die "[*] Could not open $config{'LOG_FILE'}: $!";
     close L;
     return;
 }
@@ -3269,7 +3510,8 @@ sub logr() {
     if ($stdout) {
         print STDOUT "$msg\n";
     } else {
-        open F, ">> $logfile" or die "[*] Could not open $logfile: $!";
+        open F, ">> $config{'LOG_FILE'}"
+            or die "[*] Could not open $config{'LOG_FILE'}: $!";
         print F "$msg\n";
         close F;
     }
@@ -3290,8 +3532,8 @@ Options:
                                 which options it will translate into
                                 iptables rules.
     --ipt-script=<script>     - Print iptables script to <script>
-                                instead of the normal location at
-                                $ipt_script
+                                instead of the default location at
+                                /etc/fwsnort/fwsnort.sh
     --ipt-apply               - Execute the fwsnort.sh script.
     --ipt-reject              - Add a protocol dependent REJECT rule
                                 (tcp resets for tcp or icmp port
@@ -3346,12 +3588,20 @@ Options:
                                 from fwsnort rules.
     --restrict-intf=<intf>    - Restrict fwsnort rules to a specified
                                 interface (e.g. "eth0").
+    -6, --ip6tables           - Enable ip6tables mode to build an fwsnort
+                                policy via ip6tables instead of iptables.
     --Home-net <net/mask>     - Manually specify the Home network
                                 (CIDR or standard notation).
     --External-net <net/mask> - Manually specify the external network
                                 (CIDR or standard notation).
     --update-rules            - Download latest rules from Emerging Threats
                                 (http://www.emergingthreats.net).
+    --include-perl-triggers   - Include 'perl -e "print ..."' commands that
+                                build payload data that matches snort
+                                rules.  By combining these commands with
+                                netcat, it is easy to test whether the
+                                iptables policy built by fwsnort properly
+                                detects attacks.
     --include-type=<type>     - Only process snort rules of type <type>
                                 (e.g. "ddos" or "backdoor"). <type> can
                                 be a comma separated list.
@@ -3370,8 +3620,8 @@ Options:
                                 config file located at
                                 $fwsnort_conf
     --logfile=<file>          - Log messages to <file> instead of the
-                                normal location at
-                                $logfile
+                                default location at:
+                                /var/log/fwsnort/fwsnort.log
     -N   --NFQUEUE            - Build a policy designed to only send packets
                                 that match Snort signature "content" fields
                                 to userspace via the NFQUEUE target. This is
@@ -3382,7 +3632,7 @@ Options:
     --queue-rules-dir=<dir>   - Specify the path to the generated set of
                                 Snort rules that are to be queued to
                                 userspace in --NFQUEUE or --QUEUE mode.  The
-                                default is $queue_rules_dir
+                                default is /etc/fwsnort/snort_rules_queue/.
     -Q   --QUEUE              - Same as the --NFQUEUE option, except use the
                                 older iptables QUEUE target.
     -U   --Ulog               - Force ULOG target for all log generation.
@@ -3397,7 +3647,9 @@ Options:
                                 existing iptables policy).
     --Dump-snort              - Dump Snort rules on STDOUT.
     --Dump-conf               - Dump configuration on STDOUT and exit.
-    --add-deleted             - Added Snort deleted rules.
+    --add-deleted             - Added Snort "deleted" rules.
+    --Last-cmd                - Rebuild fwsnort.sh with the same command
+                                line args as the previous execution.
     --lib-dir <path>          - Specify path to lib directory.
     --debug                   - Run in debug mode.
     -v   --verbose            - Run in verbose mode.
