@@ -1,6 +1,7 @@
-fwsnort (1.0.6-2) UNRELEASED; urgency=low
+fwsnort (1.1-1) UNRELEASED; urgency=low
 
-  * d.control: Bumped up Standards-Version to 3.8.3 (no changes).
+  * New upstream release.
+  * Bumped up Standards-Version to 3.8.3 (no changes).
   * Updated copyright years in d.changelog.
   * Updated README.Debian to explain a bit more how to handle the choice to
     download the snort rules.
@@ -8,9 +9,10 @@ fwsnort (1.0.6-2) UNRELEASED; urgency=low
     of the script with set -e (Debian Policy 10.4) in the following files:
       + d.fwsnort.config
       + d.fwsnort.postinst
-  * Updated maintainer email address in d.control and d.changelog
+  * Updated maintainer email address in d.control and d.changelog.
+  * Added d.NEWS to report important changes in the package.
 
- -- Franck Joncourt <franck@debian.org>  Mon, 21 Dec 2009 18:34:52 +0100
+ -- Franck Joncourt <franck@debian.org>  Fri, 08 Jan 2010 19:53:30 +0100
 
 fwsnort (1.0.6-1) unstable; urgency=low
 

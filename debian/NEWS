@@ -1,0 +1,8 @@
+fwsnort (1.1-1) UNRELEASED; urgency=low
+
+  * Added IPV6 support through the --ip6tables (-6) command line option.
+  * Logs are now moved, by default, to /var/log/fwsnort/fwsnort.log instead
+    /var/log/fwsnort.log.
+  * Perl trigger are now available.
+
+ -- Franck Joncourt <franck@debian.org>  Fri, 08 Jan 2010 20:01:51 +0100
