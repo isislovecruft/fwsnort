@@ -2,7 +2,7 @@ fwsnort (1.1-1) unstable; urgency=low
 
   * New upstream release.
   * Bumped up Standards-Version to 3.8.3 (no changes).
-  * Switch to dpkg-source 3.0 (native) format.
+  * Switch to dpkg-source 3.0 (quilt) format.
   * Updated copyright years in d.changelog.
   * Updated README.Debian to explain a bit more how to handle the choice to
     download the snort rules.
