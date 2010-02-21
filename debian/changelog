@@ -1,3 +1,10 @@
+fwsnort (1.1-2) unstable; urgency=low
+
+  * Added Spanish debconf template translation.
+  * Bumped up Standards-Version to 3.8.4 (no changes).
+
+ -- Franck Joncourt <franck@debian.org>  Sun, 21 Feb 2010 15:43:26 +0100
+
 fwsnort (1.1-1) unstable; urgency=low
 
   * New upstream release.
