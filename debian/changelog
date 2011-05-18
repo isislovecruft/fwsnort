@@ -1,9 +1,12 @@
-fwsnort (1.5-1) UNRELEASED; urgency=low
+fwsnort (1.5-1) unstable; urgency=low
 
-  * Imported Upstream version 1.5
-  * Updated d.copyright to DEP5 proposed format.
+  * New upstream release.
+  * d.copyright:
+    + Updated DEP5 proposed format.
+    + Refreshed copyright years.
+  * Bumped up Standards-Version to 3.9.2 (no changes) in d.control.
 
- -- Franck Joncourt <franck@debian.org>  Mon, 16 May 2011 22:07:54 +0200
+ -- Franck Joncourt <franck@debian.org>  Wed, 18 May 2011 18:45:15 +0200
 
 fwsnort (1.1-2) unstable; urgency=low
 
