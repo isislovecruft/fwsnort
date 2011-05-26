@@ -1,3 +1,9 @@
+fwsnort (1.5-2) unstable; urgency=low
+
+  * New po-debconf translation - Danish (Closes: #627714)
+
+ -- Franck Joncourt <franck@debian.org>  Thu, 26 May 2011 20:59:37 +0200
+
 fwsnort (1.5-1) unstable; urgency=low
 
   * New upstream release.
