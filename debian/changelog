@@ -1,3 +1,12 @@
+fwsnort (1.5-2.1) unstable; urgency=low
+
+   * Non-maintainer upload.
+   * Fix pending l10n issues. Debconf translations:
+     - Dutch; (Jeroen Schot).  Closes: #651834
+     - Polish (Michał Kułach).  Closes: #667946
+
+ -- Christian Perrier <bubulle@debian.org>  Mon, 16 Apr 2012 09:12:41 +0200
+
 fwsnort (1.5-2) unstable; urgency=low
 
   * New po-debconf translation - Danish (Closes: #627714)
