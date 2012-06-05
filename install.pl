@@ -25,8 +25,6 @@
 #
 #######################################################################
 #
-# $Id: install.pl 552 2011-01-03 01:38:51Z mbr $
-#
 
 use Cwd;
 use IO::Socket;
@@ -54,9 +52,9 @@ my %config = ();
 
 ### map perl modules to versions
 my %required_perl_modules = (
-    'Net::IPv4Addr' => {
+    'NetAddr::IP' => {
         'force-install' => 0,
-        'mod-dir' => 'Net-IPv4Addr'
+        'mod-dir' => 'NetAddr-IP'
     },
     'IPTables::Parse' => {
         'force-install' => 1,
@@ -217,7 +215,7 @@ sub install() {
 
     print "\n========================================================\n",
         "\n[+] fwsnort will generate an iptables script located at:\n",
-        "    /etc/fwsnort/fwsnort.sh when executed.\n",
+        "    /var/lib/fwsnort.sh when executed.\n",
         "\n[+] fwsnort has been successfully installed!\n\n";
 
     return;

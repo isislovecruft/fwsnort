@@ -1,5 +1,5 @@
 %define name fwsnort
-%define version 1.5
+%define version 1.6.2
 %define release 1
 %define fwsnortlogdir /var/log/fwsnort
 
@@ -85,6 +85,16 @@ install -m 644 fwsnort.8 $RPM_BUILD_ROOT%{_mandir}/man8/
 %config(noreplace) %_sysconfdir/%name/fwsnort.conf
 
 %changelog
+* Sat Apr 28 2012 Michael Rash <mbr@cipherydne.org>
+- Updated to use the NetAddr::IP module for all IP/subnet calculations
+- fwsnort-1.6.2 release
+
+* Thu Aug 11 2011 Michael Rash <mbr@cipherydne.org>
+- fwsnort-1.6.1 release
+
+* Wed Jul 27 2010 Michael Rash <mbr@cipherydne.org>
+- fwsnort-1.6 release
+
 * Sat Jan 08 2010 Michael Rash <mbr@cipherydne.org>
 - fwsnort-1.5 release
 
