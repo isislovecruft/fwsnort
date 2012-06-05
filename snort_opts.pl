@@ -10,8 +10,6 @@
 #
 ########################################################################
 #
-# $Id: snort_opts.pl 290 2007-02-15 04:18:19Z mbr $
-#
 
 my %options = (
     'flow'         => 0,
@@ -55,18 +53,25 @@ my %options = (
     'within'       => 0,
     'byte_jump'    => 0,
     'byte_test'    => 0,
-    'pcre'         => 0
+    'pcre'         => 0,
+    'http_header'  => 0,
+    'http_uri'     => 0,
+    'urilen'       => 0,
+    'http_method'  => 0,
+    'fast_pattern' => 0,
+    'metadata'     => 0,
+    'threshold'    => 0,
+    'detection_filter' => 0,
 );
 
-
-my $dir   = 'snort_rules';
+my $dir   = 'deps/snort_rules';
 my $total_rules = 0;
 
-opendir D, $dir or die " ** Could not open $dir: $!";
+opendir D, $dir or die "[*] Could not open $dir: $!";
 my @rfiles = readdir D;
 closedir D;
 
-print " .. Calculating snort rule keyword percentages:\n";
+print "[+] Calculating snort rule keyword percentages:\n";
 for my $rfile (@rfiles) {
     next unless $rfile =~ /\.rules/;
     open R, "< $dir/$rfile" or die $!;
@@ -91,8 +96,14 @@ for my $rfile (@rfiles) {
         }
     }
 }
+
+my $max_opt_len = 0;
+for my $opt (keys %options) {
+    $max_opt_len = length($opt) if length($opt) > $max_opt_len;
+}
+
 for my $opt (sort {$options{$b} <=> $options{$a}} keys %options) {
-    printf("%13s %13s", $opt, "$options{$opt}/$total_rules  ");
+    printf("%${max_opt_len}s %13s", $opt, "$options{$opt}/$total_rules  ");
     print sprintf("%.1f", $options{$opt} / $total_rules * 100) . "%\n";
 }
 
