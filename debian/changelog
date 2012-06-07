@@ -6,6 +6,8 @@ fwsnort (1.6.2-1) UNRELEASED; urgency=low
       (Closes: #674114)
     + Updated perl dependency from libnetwork-ipv4addr-perl to libnet-ip-perl
       in d.control.
+    + Generated script such as fwsnort.sh as moved to /var/lib/fwsnort. We
+      make sure to remove them in d.fwsnort.postrm when purging the package.
   * Bumped up Standards-Version to 3.9.3:
     + Refreshed copyright holders and updated d.copyright to comply with the
       1.0 machine-readable copyright file specification.

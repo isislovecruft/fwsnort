@@ -1,3 +1,4 @@
 etc/fwsnort
 etc/fwsnort/snort_rules
 usr/sbin
+var/lib/fwsnort

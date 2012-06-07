@@ -15,11 +15,13 @@ if [ "$1"  = "purge" ]; then
 	# Every time fwsnort is used to generate an iptables script, if an old
 	# script is found, the previous one is moved to the archives directory.
 	# Therefore, we have to make sure we remove this directory and the default
-	# script fwsnort.sh.
-	[ -f /etc/fwsnort/fwsnort.sh ] && rm /etc/fwsnort/fwsnort.sh
-	if [ -d /etc/fwsnort/archive ]; then
-		find /etc/fwsnort/archive/ -type f -exec rm {} \;
-		rmdir /etc/fwsnort/archive
+	# generated scripts.
+	if [ -d /var/lib/fwsnort/archive ]; then
+		find /var/lib/fwsnort/archive/ -type f -exec rm {} \;
+		rmdir /var/lib/fwsnort/archive
+	fi
+	if [ -d /var/lib/fwsnort/ ]; then
+		find /var/lib/fwsnort/ -type f -exec rm {} \;
 	fi
 
 	# We take care of the default directory where users can store their rules.
