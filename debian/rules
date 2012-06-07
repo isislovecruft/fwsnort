@@ -12,7 +12,12 @@ DESTDIR_ETC	= $(CURDIR)/debian/$(PROGRAM)/etc/$(PROGRAM)/
 clean:
 	dh $@
 
-build: 
+build: build-arch build-indep
+
+build-arch:
+
+build-indep:
+
 
 install: install-stamp
 install-stamp:
@@ -27,11 +32,11 @@ install-stamp:
 
 	touch $@
 	
-binary-indep: install
+binary-indep: build-indep install
 	dh $@
 
 binary-arch:
 
 binary: binary-indep binary-arch
-.PHONY: clean build binary-indep binary-arch binary install
+.PHONY: clean build binary-indep binary-arch binary install build-arch build_indep
 
