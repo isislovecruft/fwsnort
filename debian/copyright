@@ -1,10 +1,10 @@
-Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=135
-Name: fwsnort
-Maintainer: Michael B. Rash <mbr@cipherdyne.com>
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Contact: Michael B. Rash <mbr@cipherdyne.com>
+Upstream-Name: fwsnort
 Source: http://www.cipherdyne.org/fwsnort/download/
 
 Files: *
-Copyright: Copyright 2003-2011 by Michael B. Rash <mbr@cipherdyne.com>
+Copyright: Copyright 2003-2012 by Michael B. Rash <mbr@cipherdyne.com>
 License: GPL-2+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@ License: GPL-2+
  Debian system under /usr/share/common-licenses/
 
 Files: debian/*
-Copyright: Copyright 2008-2011 by Franck Joncourt <franck@debian.org>
+Copyright: Copyright 2008-2012 by Franck Joncourt <franck@debian.org>
 License: GPL-2+
  Debian packaging is licensed under the same terms as the software itself 
  (see above).
