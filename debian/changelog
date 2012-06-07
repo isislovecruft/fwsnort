@@ -4,6 +4,8 @@ fwsnort (1.6.2-1) UNRELEASED; urgency=low
   * Imported Upstream version 1.6.2
     + Bug fix for 'qw(...) usage as parenthesis' warnings for perl > 5.14
       (Closes: #674114)
+    + Updated perl dependency from libnetwork-ipv4addr-perl to libnet-ip-perl
+      in d.control.
   * Bumped up Standards-Version to 3.9.3:
     + Refreshed copyright holders and updated d.copyright to comply with the
       1.0 machine-readable copyright file specification.
