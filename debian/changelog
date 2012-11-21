@@ -1,3 +1,9 @@
+fwsnort (1.6.2-2) UNRELEASED; urgency=low
+
+  * New po-debconf translation - Brazilian Portuguese (Closes: #693362)
+
+ -- Franck Joncourt <franck@debian.org>  Wed, 21 Nov 2012 21:19:14 +0100
+
 fwsnort (1.6.2-1) unstable; urgency=low
 
   * Acknowledged NMU: 1.5-2.1
