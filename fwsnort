@@ -14,7 +14,7 @@
 #
 # Credits: (see the CREDITS file)
 #
-# Version: 1.6.2
+# Version: 1.6.3
 #
 # Copyright (C) 2003-2012 Michael Rash (mbr@cipherdyne.org)
 #
@@ -27,7 +27,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+#    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
 #    USA
 #
 # TODO:
@@ -102,7 +102,7 @@ my $CONFIG_DEFAULT = '/etc/fwsnort/fwsnort.conf';
 my $fwsnort_conf = $CONFIG_DEFAULT;
 
 ### version number
-my $version = '1.6.2';
+my $version = '1.6.3';
 
 my %ipt_hdr_opts = (
     'src'      => '-s',
@@ -122,34 +122,34 @@ my %snort_opts = (
         ### application layer
         'uricontent' => {  ### use --strict to not translate this
             'iptopt' => '-m string',
-            'regex'  => '[\s;]uricontent:\s*\"(.*?)\"\s*;'
+            'regex'  => qr/[\s;]uricontent:\s*\"(.*?)\"\s*;/
         },
         'content' => {
             'iptopt' => '-m string',
-            'regex'  => '[\s;]content:\s*\"(.*?)\"\s*;'
+            'regex'  => qr/[\s;]content:\s*\"(.*?)\"\s*;/
         },
         'fast_pattern' => {
             'iptopt' => '',  ### fast_pattern just governs ordering of
                              ### content matches
-            'regex'  => '[\s;]fast_pattern(?::\s*.*?\s*)?;',
+            'regex'  => qr/[\s;]fast_pattern(?::\s*.*?\s*)?;/,
         },
         'pcre' => {
             ### only basic PCRE's that just have strings separated
             ### by ".*" or ".+" are supported.
             'iptopt' => '-m string',
-            'regex'  => '[\s;]pcre:\s*\"(.*?)\"\s*;'
+            'regex'  => qr/[\s;]pcre:\s*\"(.*?)\"\s*;/
         },
         'nocase'  => {
             'iptopt' => '--icase',
-            'regex'  => '[\s;]nocase\s*;',
+            'regex'  => qr/[\s;]nocase\s*;/,
         },
         'offset'  => {
             'iptopt' => '--from',
-            'regex'  => '[\s;]offset:\s*(\d+)\s*;'
+            'regex'  => qr/[\s;]offset:\s*(\d+)\s*;/
         },
         'depth' =>  {
             'iptopt' => '--to',
-            'regex'  => '[\s;]depth:\s*(\d+)\s*;'
+            'regex'  => qr/[\s;]depth:\s*(\d+)\s*;/
         },
 
         ### technically, the "distance" and "within" criteria
@@ -161,115 +161,143 @@ my %snort_opts = (
         ### use the --strict option.
         'distance'  => {
             'iptopt' => '--from',
-            'regex'  => '[\s;]distance:\s*(\d+)\s*;'
+            'regex'  => qr/[\s;]distance:\s*(\d+)\s*;/
         },
         'within' =>  {
             'iptopt' => '--to',
-            'regex'  => '[\s;]within:\s*(\d+)\s*;'
+            'regex'  => qr/[\s;]within:\s*(\d+)\s*;/
         },
         'replace' => {  ### for Snort running in inline mode
             'iptopt' => '--replace-string',
-            'regex'  => '[\s;]replace:\s*\"(.*?)\"\s*;'
+            'regex'  => qr/[\s;]replace:\s*\"(.*?)\"\s*;/
         },
         'resp' => {
             'iptopt' => '-j REJECT',
-            'regex'  => '[\s;]resp:\s*(.*?)\s*;'
+            'regex'  => qr/[\s;]resp:\s*(.*?)\s*;/
         },
 
         ### transport layer
         'flags' => {
             'iptopt' => '--tcp-flags',
-            'regex'  => '[\s;]flags:\s*(.*?)\s*;'
+            'regex'  => qr/[\s;]flags:\s*(.*?)\s*;/
         },
         'flow' => {
             'iptopt' => '--tcp-flags',
-            'regex'  => '[\s;]flow:\s*(.*?)\s*;'
+            'regex'  => qr/[\s;]flow:\s*(.*?)\s*;/
         },
 
         ### network layer
         'itype' => {
             'iptopt' => '--icmp-type',  ### --icmp-type type/code
-            'regex'  => '[\s;]itype:\s*(.*?)\s*;'
+            'regex'  => qr/[\s;]itype:\s*(.*?)\s*;/
         },
         'icode' => {
             'iptopt' => 'NONE',
-            'regex'  => '[\s;]icode:\s*(.*?)\s*;'
+            'regex'  => qr/[\s;]icode:\s*(.*?)\s*;/
         },
         'ttl' => {
             'iptopt' => '-m ttl', ### requires CONFIG_IP_NF_MATCH_TTL
-            'regex'  => '[\s;]ttl:\s*(.*?)\s*;'
+            'regex'  => qr/[\s;]ttl:\s*(.*?)\s*;/
         },
         'tos' => {
             'iptopt' => '-m tos --tos', ### requires CONFIG_IP_NF_MATCH_TOS
-            'regex'  => '[\s;]tos:\s*(\d+)\s*;'
+            'regex'  => qr/[\s;]tos:\s*(\d+)\s*;/
         },
         'ipopts' => {
             'iptopt' => '-m ipv4options',  ### requires ipv4options extension
-            'regex'  => '[\s;]ipopts:\s*(\w+)\s*;'
+            'regex'  => qr/[\s;]ipopts:\s*(\w+)\s*;/
         },
         'ip_proto' => {
             'iptopt' => '-p',
-            'regex'  => '[\s;]ip_proto:\s*(.*?)\s*;'
+            'regex'  => qr/[\s;]ip_proto:\s*(.*?)\s*;/
         },
         'dsize' => {  ### requires CONFIG_IP_NF_MATCH_LENGTH
             'iptopt' => '-m length --length',
-            'regex'  => '[\s;]dsize:\s*(.*?)\s*;'
+            'regex'  => qr/[\s;]dsize:\s*(.*?)\s*;/
         },
     },
 
     ### snort options that can be put into iptables
     ### ruleset, but only in log messages with --log-prefix
     'logprefix' =>  {
-        'sid'       => '[\s;]sid:\s*(\d+)\s*;',
-        'msg'       => '[\s;]msg:\s*\"(.*?)\"\s*;',  ### we create a space
-        'classtype' => '[\s;]classtype:\s*(.*?)\s*;',
-        'reference' => '[\s;]reference:\s*(.*?)\s*;',
-        'priority'  => '[\s;]priority:\s*(\d+)\s*;',
-        'rev'       => '[\s;]rev:\s*(\d+)\s*;',
+        'sid'       => qr/[\s;]sid:\s*(\d+)\s*;/,
+        'msg'       => qr/[\s;]msg:\s*\"(.*?)\"\s*;/,  ### we create a space
+        'classtype' => qr/[\s;]classtype:\s*(.*?)\s*;/,
+        'reference' => qr/[\s;]reference:\s*(.*?)\s*;/,
+        'priority'  => qr/[\s;]priority:\s*(\d+)\s*;/,
+        'rev'       => qr/[\s;]rev:\s*(\d+)\s*;/,
     },
 
     ### snort options that cannot be included directly
     ### within iptables filter statements (yet :)
     'unsupported' => {
-        'asn1'         => '[\s;]asn1:\s*.*?\s*;',
-        'fragbits'     => '[\s;]fragbits:\s*.*?\s*;',
-        'content-list' => '[\s;]content\-list:\s*\".*?\"\s*;',
-        'rpc'          => '[\s;]rpc:\s*.*?\s*;',
-        'byte_test'    => '[\s;]byte_test\s*.*?\s*;',
-        'byte_jump'    => '[\s;]byte_jump\s*.*?\s*;',
-        'window'       => '[\s;]window:\s*.*?\s*;',
-        'flowbits'     => '[\s;]flowbits:\s*.*?\s*;',
-#        'offset'       => '[\s;]offset:\s*\d+\s*;',
-#        'depth'        => '[\s;]depth:\s*\d+\s*;',
+        'asn1'         => qr/[\s;]asn1:\s*.*?\s*;/,
+        'fragbits'     => qr/[\s;]fragbits:\s*.*?\s*;/,
+        'content-list' => qr/[\s;]content\-list:\s*\".*?\"\s*;/,
+        'rpc'          => qr/[\s;]rpc:\s*.*?\s*;/,
+        'byte_test'    => qr/[\s;]byte_test\s*.*?\s*;/,
+        'byte_jump'    => qr/[\s;]byte_jump\s*.*?\s*;/,
+        'byte_extract' => qr/[\s;]byte_extract\s*.*?\s*;/,
+        'file_data'    => qr/[\s;]file_data\s*;/,
+        'window'       => qr/[\s;]window:\s*.*?\s*;/,
+        'flowbits'     => qr/[\s;]flowbits:\s*.*?\s*;/,
+        'tag'          => qr/[\s;]tag:\s*.*?\s*;/,
+        'ftpbounce'    => qr/[\s;]ftpbounce\s*;/,
+        'base64_data'  => qr/[\s;]base64_data\s*;/,
+        'base64_decode' => qr/[\s;]base64_decode:\s*.*?\s*;/,
+#        'offset'       => qr/[\s;]offset:\s*\d+\s*;/,
+#        'depth'        => qr/[\s;]depth:\s*\d+\s*;/,
 
         ### the following fields get logged by iptables but
         ### we cannot filter them directly except with the
         ### iptables u32 module.  Functionality has been built
         ### into psad to generate alerts for most of these Snort
         ### options.
-        'id'        => '[\s;]id:\s*(\d+)\s*;',
-        'seq'       => '[\s;]seq:\s*(\d+)\s*;',  ### --log-tcp-sequence
-        'ack'       => '[\s;]ack:\s*.*?\s*;',    ### --log-tcp-sequence
-        'icmp_seq'  => '[\s;]icmp_seq:\s*(\d+)\s*;',
-        'icmp_id'   => '[\s;]icmp_id:\s*(\d+)\s*;',
-        'sameip'    => '[\s;]sameip\s*;',
-        'regex'     => '[\s;]regex:\s*(.*?)\s*;',
-        'isdataat'  => '[\s;]isdataat:\s*(.*?)\s*;',
-        'threshold' => '[\s;]threshold:\s*.*?\s*;',               ### FIXME --limit
-        'detection_filter' => '[\s;]detection_filter:\s*.*?\s*;'  ### FIXME --limit
+        'id'        => qr/[\s;]id:\s*(\d+)\s*;/,
+        'seq'       => qr/[\s;]seq:\s*(\d+)\s*;/,  ### --log-tcp-sequence
+        'ack'       => qr/[\s;]ack:\s*.*?\s*;/,    ### --log-tcp-sequence
+        'icmp_seq'  => qr/[\s;]icmp_seq:\s*(\d+)\s*;/,
+        'icmp_id'   => qr/[\s;]icmp_id:\s*(\d+)\s*;/,
+        'sameip'    => qr/[\s;]sameip\s*;/,
+        'regex'     => qr/[\s;]regex:\s*(.*?)\s*;/,
+        'isdataat'  => qr/[\s;]isdataat:\s*(.*?)\s*;/,
+        'threshold' => qr/[\s;]threshold:\s*.*?\s*;/,               ### FIXME --limit
+        'detection_filter' => qr/[\s;]detection_filter:\s*.*?\s*;/  ### FIXME --limit
     },
 
     ### snort options that fwsnort will ignore
     'ignore' => {
-        'rawbytes' => '[\s;]rawbytes\s*;',  ### iptables does a raw match anyway
-        'logto'    => '[\s;]logto:\s*\S+\s*;',
-        'session'  => '[\s;]session\s*;',
-        'tag'      => '[\s;]tag:\s*.*?\s*;',
-        'react'    => '[\s;]react:\s*.*?\s*;', ### FIXME -j REJECT
-        'http_uri' => '[\s;]http_uri\s*;',
-        'http_method' => '[\s;]http_method\s*;',
-        'urilen'    => '[\s;]urilen:\s*.*?\s*;',
-    }
+        'rawbytes' => qr/[\s;]rawbytes\s*;/,  ### iptables does a raw match anyway
+        'logto'    => qr/[\s;]logto:\s*\S+\s*;/,
+        'session'  => qr/[\s;]session\s*;/,
+        'tag'      => qr/[\s;]tag:\s*.*?\s*;/,
+        'react'    => qr/[\s;]react:\s*.*?\s*;/, ### FIXME -j REJECT
+        'http_uri' => qr/[\s;]http_uri\s*;/,
+        'http_raw_uri' => qr/[\s;]http_raw_uri\s*;/,
+        'http_method' => qr/[\s;]http_method\s*;/,
+        'http_stat_code' => qr/[\s;]http_stat_code\s*;/,
+        'http_stat_msg' => qr/[\s;]http_stat_msg\s*;/,
+        'http_client_body' => qr/[\s;]http_client_body\s*;/,
+        'http_cookie' => qr/[\s;]http_cookie\s*;/,
+        'urilen'    => qr/[\s;]urilen:\s*.*?\s*;/,
+    },
+
+    ### in --strict mode, signatures that include any of these
+    ### options are not translated to iptables rules
+    'strict_list' => [
+        'uricontent',
+        'pcre',
+        'distance',
+        'within',
+        'http_uri',
+        'http_raw_uri',
+        'http_method',
+        'http_stat_code',
+        'http_stat_msg',
+        'http_client_body',
+        'http_cookie',
+        'urilen'
+    ]
 );
 
 ### rules update link
@@ -356,8 +384,11 @@ my %restrict_interfaces = ();
 my $home_net   = '';  ### normally comes from fwsnort.conf
 my $ext_net    = '';  ### normally comes from fwsnort.conf
 my $ipt_exec   = 0;
+my $ipt_revert = 0;
 my $ipt_drop   = 0;
 my $ipt_reject = 0;
+my $ipt_max_buf_len = 1025;
+my $ipt_cap_search_factor = 128;
 my $help       = 0;
 my $stdout     = 0;
 my $lib_dir    = '';
@@ -475,7 +506,11 @@ my @argv_cp = @ARGV;
 
 ### check to make sure iptables has various functionality available
 ### such as the LOG target, --hex-strings, the comment match, etc.
-&ipt_capabilities() unless $no_ipt_test;
+if ($no_ipt_test) {
+    &set_defaults_without_ipt_test();
+} else {
+    &ipt_capabilities();
+}
 
 ### cache the running iptables policy in iptables-save format
 &cache_ipt_save_policy();
@@ -605,7 +640,7 @@ sub parse_snort_rules() {
         if ($exclude_types) {
             next FILE if defined $exclude_types{$type};
         }
-        if ($rfile eq 'deleted.rules') {
+        if ($rfile =~ m|deleted\.rules|) {
             next FILE unless $add_deleted;
         }
         ($snort_type) = ($rfile =~ m|.*/(\S+)\.rules|);
@@ -643,7 +678,7 @@ sub parse_snort_rules() {
 
             ### regex filters
             if ($exclude_re) {
-                next RULE unless $rule =~ $exclude_re;
+                next RULE if $rule =~ $exclude_re;
             }
 
             if ($include_re) {
@@ -682,10 +717,8 @@ sub parse_snort_rules() {
             }
 
             ### parse options portion of Snort rule
-            my ($parse_rv, $opts_hr, $patterns_ar)
-                            = &parse_rule_options($rule_options,
-                                    &get_avg_hdr_len($hdr_hr),
-                                    $line_num);
+            my ($parse_rv, $opts_hr, $patterns_ar) = &parse_rule_options(
+                    $rule_options, &get_avg_hdr_len($hdr_hr), $line_num);
 
             unless ($parse_rv) {
                 $unsup_ctr++;
@@ -822,7 +855,7 @@ sub parse_rule_options() {
     my @patterns = ();
 
     ### get the sid here for logging purposes
-    if ($rule_options =~ /$snort_opts{'logprefix'}{'sid'}/) {
+    if ($rule_options =~ $snort_opts{'logprefix'}{'sid'}) {
         $sid = $1;
     } else {
         return 0, \%opts, \@patterns;
@@ -847,7 +880,7 @@ sub parse_rule_options() {
         my $found_unsupported = '';
         for my $opt (keys %{$snort_opts{'unsupported'}}) {
             ### see if we match a regex belonging to an unsupported option
-            if ($rule_options =~ /$snort_opts{'unsupported'}{$opt}/) {
+            if ($rule_options =~ $snort_opts{'unsupported'}{$opt}) {
                 $found_unsupported .= "'$opt', ";
             }
         }
@@ -871,7 +904,7 @@ sub parse_rule_options() {
 
     for my $opt (keys %{$snort_opts{'filter'}}) {
         ### see if we match the option regex
-        if ($rule_options =~ /$snort_opts{'filter'}{$opt}{'regex'}/) {
+        if ($rule_options =~ $snort_opts{'filter'}{$opt}{'regex'}) {
             $opts{$opt} = 1;
             $opts{$opt} = $1 if defined $1;  ### some keywords may not have an option
         }
@@ -971,7 +1004,7 @@ sub parse_rule_options() {
     }
 
     for my $opt (keys %{$snort_opts{'logprefix'}}) {
-        if ($rule_options =~ /$snort_opts{'logprefix'}{$opt}/) {
+        if ($rule_options =~ $snort_opts{'logprefix'}{$opt}) {
             $opts{$opt} = $1;
         }
     }
@@ -1520,7 +1553,11 @@ sub ipt_build() {
     ### define iptables source and destination
     if ($snort_hdr_hr->{'dst'} =~ /any/i) {
         if ($snort_hdr_hr->{'src'} =~ /any/i) {
-            push @{$process_rules{'INPUT'}}, '' if $process_chains{'INPUT'};
+            if ($orig_snort_rule =~ m|\$HOME_NET.*\-\>\s+\$EXTERNAL_NET|) {
+                push @{$process_rules{'OUTPUT'}}, '' if $process_chains{'OUTPUT'};
+            } else {
+                push @{$process_rules{'INPUT'}}, '' if $process_chains{'INPUT'};
+            }
             push @{$process_rules{'FORWARD'}}, ''
                 if $process_chains{'FORWARD'};
         } else {
@@ -2217,33 +2254,41 @@ sub convert_pattern_for_iptables() {
         'nocase'         => 0,
     );
 
-    if ($ipt_str =~ /\s*\!\s*"/) {
-        $ipt_str =~ s/\s*\!\s*"//;
+    if ($ipt_str =~ /^\s*\!\s*"/) {
+        $ipt_str =~ s/^\s*\!\s*"//;
         $pattern{'negative_match'} = 1;
     }
-
-    $ipt_str =~ s/`/|60|/g;     ### ` -> |60|
-    $ipt_str =~ s/'/|27|/g;     ### ' -> |27|
-    $ipt_str =~ s/\x2d/|2d|/g;  ### - -> |2d|
-    $ipt_str =~ s/\x24/|24|/g;  ### $ -> |24|
 
     ### convert all escaped chars to their hex equivalents
     $ipt_str =~ s/\x5c(.)/sprintf "|%02x|", (ord($1))/eg;
 
-    my $ctr = 0;
-    while ($ipt_str =~ m/\|\|/) {
-        ### consolidate consecutive hex blocks
-        if ($ipt_str =~ /\|.+?\|\|.+?\|/) {
-            $ipt_str =~ s/\|(.+?)\|\|(.+?)\|/|$1 $2|/;
-        }
-        $ctr++;
-        last if $ctr > 10;
-    }
+    ### consolidate any consecutive "|aa||bb|" sequences
+    $ipt_str =~ s/\|\|//g;
 
     ### remove all spaces between hex codes (they simply waste space
     ### on the command line, and they aren't part of the string to
     ### search in network traffic anyway).
     $ipt_str = &consolidate_hex_spaces($ipt_str);
+
+    ### if there are any existing hex blocks or if there are any chars
+    ### that require a new hex block, then just convert the whole string
+    ### to hex syntax for simplicity
+    if ($ipt_str =~ /\|/ or &have_hex_char($ipt_str)) {
+        $ipt_str = &convert_str_to_hex($ipt_str);
+    }
+
+    ### if we ever have more than one hex block then there was some
+    ### pattern translation error
+    my $hex_ctr = 0;
+    while ($ipt_str =~ /\|/g) {
+        $hex_ctr++;
+        last if $hex_ctr >= 10;
+    }
+
+    if ($hex_ctr > 2) {
+        return 0, "too many hex blocks, could not translate: $snort_str",
+            \%pattern;
+    }
 
     ### handles length of hex blocks
     my $content_len = &get_content_len($ipt_str);
@@ -2393,6 +2438,7 @@ sub get_content_len() {
 
 sub consolidate_hex_spaces() {
     my $str = shift;
+
     my $new_str = '';
     my $hex_mode = 0;
     my @chars = split //, $str;
@@ -2405,6 +2451,42 @@ sub consolidate_hex_spaces() {
         }
         $new_str .= $char;
     }
+    return $new_str;
+}
+
+sub have_hex_char() {
+    my $str = shift;
+    return 1 if $str =~ /[^A-Za-z0-9]/;
+    return 0;
+}
+
+sub convert_str_to_hex() {
+    my $str = shift;
+
+    my $new_str = '';
+    my $hex_mode = 0;
+    my @chars = split //, $str;
+    CHAR: for my $char (@chars) {
+        if ($char eq '|') {
+            if ($hex_mode) {
+                $new_str .= $char;
+                $hex_mode = 0;
+            } else {
+                $new_str .= $char;
+                $hex_mode = 1;
+            }
+            next CHAR;
+        }
+        if ($hex_mode) {
+            $new_str .= $char;
+        } else {
+            $new_str .= sprintf "|%02x|", ord($char);
+        }
+    }
+
+    ### consolidate any consecutive "|aa||bb|" sequences
+    $new_str =~ s/\|\|//g;
+
     return $new_str;
 }
 
@@ -2967,6 +3049,7 @@ sub ipt_add_conntrack_jumps() {
                 qq|--state $conntrack_state -j | .
                 qq|$config{"FWSNORT_${chain}_ESTAB"}|;
         }
+        next unless $rule_str;
 
         push @ipt_script_lines, qq|\$${ipt_var_str} $rule_str|;
         push @{$save_format_conntrack_jumps{$config{"FWSNORT_$chain"}}},
@@ -3310,6 +3393,15 @@ sub fwsnort_init() {
         } else {
             die "[*] $config{'FWSNORT_SAVE_EXEC_FILE'} does not exist.";
         }
+    } elsif ($ipt_revert) {
+        die "[*] You need to be root for --ipt-revert" unless $is_root;
+        if (-e $config{'FWSNORT_SAVE_EXEC_FILE'}) {
+            print "[+] Executing $config{'FWSNORT_SAVE_EXEC_FILE'}\n";
+            system "$config{'FWSNORT_SAVE_EXEC_FILE'} -r";
+            exit 0;
+        } else {
+            die "[*] $config{'FWSNORT_SAVE_EXEC_FILE'} does not exist.";
+        }
     }
 
     if ($enable_ip6tables) {
@@ -3401,11 +3493,16 @@ sub fwsnort_init() {
 
     if ($strict) {
         ### make the snort options parser very strict
-        for my $opt (qw(uricontent pcre
-                distance within http_uri http_method urilen)) {
-            $snort_opts{'unsupported'}{$opt}
-                = $snort_opts{'filter'}{$opt};
-            delete $snort_opts{'filter'}{$opt};
+        for my $opt (@{$snort_opts{'strict_list'}}) {
+            if (defined $snort_opts{'filter'}{$opt}) {
+                $snort_opts{'unsupported'}{$opt}
+                    = $snort_opts{'filter'}{$opt};
+                delete $snort_opts{'filter'}{$opt};
+            } elsif (defined $snort_opts{'ignore'}{$opt}) {
+                $snort_opts{'unsupported'}{$opt}
+                    = $snort_opts{'ignore'}{$opt};
+                delete $snort_opts{'ignore'}{$opt};
+            }
         }
         my @ignore = (qw(nocase));
 
@@ -3456,6 +3553,8 @@ sub handle_cmd_line() {
 
     die "[*] Use --help for usage information.\n" unless (GetOptions(
         'ipt-apply'      => \$ipt_exec,     # Apply the generated ruleset.
+        'ipt-exec'       => \$ipt_exec,     # Apply the generated ruleset.
+        'ipt-revert'     => \$ipt_revert,     # Apply the generated ruleset.
         'ipt-drop'       => \$ipt_drop,     # Add iptables DROP rules.
         'ipt-reject'     => \$ipt_reject,   # Add iptables REJECT rules.
         'ipt-script=s'   => \$ipt_script,   # Manually specify the path to the
@@ -3648,11 +3747,16 @@ sub expand_vars() {
                     die "[*] sub-ver $sub_var not allowed within same ",
                         "variable $var" if $sub_var eq $var;
                     if (defined $config{$sub_var}) {
-                        $val =~ s|\$$sub_var|$config{$sub_var}|;
+                        if ($sub_var eq 'INSTALL_ROOT'
+                                and $config{$sub_var} eq '/') {
+                            $val =~ s|\$$sub_var||;
+                        } else {
+                            $val =~ s|\$$sub_var|$config{$sub_var}|;
+                        }
                         $hr->{$var} = $val;
                     } else {
                         die "[*] sub-var \"$sub_var\" not defined in ",
-                            "config for var: $var.";
+                            "config for var: $var."
                     }
                     $has_sub_var = 1;
                 }
@@ -3673,7 +3777,7 @@ sub required_vars() {
         FWSNORT_FORWARD_JUMP MAX_STRING_LEN CONF_DIR RULES_DIR ARCHIVE_DIR
         QUEUE_RULES_DIR LOG_DIR LIBS_DIR CONF_FILE FWSNORT_SCRIPT LOG_FILE
         FWSNORT_SAVE_FILE FWSNORT_SAVE_EXEC_FILE IPT_BACKUP_SAVE_FILE
-        UPDATE_RULES_URL STATE_DIR
+        UPDATE_RULES_URL STATE_DIR INSTALL_ROOT
     ));
     for my $var (@required_vars) {
         die "[*] Variable $var not defined in $fwsnort_conf. Exiting.\n"
@@ -3698,7 +3802,13 @@ sub ipt_capabilities() {
             if $verbose or $ipt_check_capabilities;
 
         ### check for the max --log-prefix string length
-        &ipt_find_max_log_prefix_len();
+        $ipt_max_log_prefix_len = &ipt_find_max_len(
+            $ipt_max_log_prefix_len, qq|-I $TEST_CHAIN $IPT_TEST_RULE_NUM -s | .
+            qq|$non_host -p tcp --dport 1234 -j LOG --log-prefix "|, qq|"|
+        );
+
+        print "    Max supported LOG prefix length: $ipt_max_log_prefix_len\n"
+            if $verbose or $ipt_check_capabilities;
 
     } else {
         &delete_test_chain();
@@ -3716,8 +3826,14 @@ sub ipt_capabilities() {
         print "[+] $ipt_str has 'comment' match support...\n"
             if $verbose or $ipt_check_capabilities;
 
-        ### now find the maximum comment length that is supported by iptables
-        &ipt_find_max_comment_len();
+        $ipt_max_comment_len = &ipt_find_max_len(
+            $ipt_max_comment_len, qq|-I $TEST_CHAIN $IPT_TEST_RULE_NUM -s | .
+            qq|$non_host -p tcp --dport 1234 -m comment --comment | .
+            qq|"|, qq|" -j LOG|
+        );
+
+        print "    Max supported comment length: $ipt_max_comment_len\n"
+            if $verbose or $ipt_check_capabilities;
 
     } else {
         unless ($no_ipt_comments) {
@@ -3742,7 +3858,7 @@ sub ipt_capabilities() {
                 $snort_opts{'filter'}{'ipopts'}{'regex'};
             delete $snort_opts{'filter'}{'ipopts'};
         } else {
-            $snort_opts{'unsupported'}{'ipopts'} = '[\s;]ipopts:\s*(\w+)\s*;';
+            $snort_opts{'unsupported'}{'ipopts'} = qr/[\s;]ipopts:\s*(\w+)\s*;/;
         }
         print "[-] $ipt_str does not have the 'ipv4options' extension, " .
             "disabling...\n" if $verbose or $ipt_check_capabilities;
@@ -3762,7 +3878,7 @@ sub ipt_capabilities() {
                 $snort_opts{'filter'}{'ttl'}{'regex'};
             delete $snort_opts{'filter'}{'ttl'};
         } else {
-            $snort_opts{'unsupported'}{'ttl'} = '[\s;]ttl:\s*(.*?)\s*;';
+            $snort_opts{'unsupported'}{'ttl'} = qr/[\s;]ttl:\s*(.*?)\s*;/;
         }
         print "[+] $ipt_str does not have the 'ttl' match, " .
             "disabling...\n" if $verbose or $ipt_check_capabilities;
@@ -3782,7 +3898,7 @@ sub ipt_capabilities() {
                 $snort_opts{'filter'}{'tos'}{'regex'};
             delete $snort_opts{'filter'}{'tos'};
         } else {
-            $snort_opts{'unsupported'}{'tos'} = '[\s;]tos:\s*(.*?)\s*;';
+            $snort_opts{'unsupported'}{'tos'} = qr/[\s;]tos:\s*(.*?)\s*;/;
         }
         print "[+] $ipt_str does not have the 'tos' match, " .
             "disabling...\n" if $verbose or $ipt_check_capabilities;
@@ -3802,7 +3918,7 @@ sub ipt_capabilities() {
                 $snort_opts{'filter'}{'dsize'}{'regex'};
             delete $snort_opts{'filter'}{'dsize'};
         } else {
-            $snort_opts{'unsupported'}{'dsize'} = '[\s;]dsize:\s*(.*?)\s*;';
+            $snort_opts{'unsupported'}{'dsize'} = qr/[\s;]dsize:\s*(.*?)\s*;/;
         }
         print "[+] $ipt_str does not have the 'length' match, " .
             "disabling...\n" if $verbose or $ipt_check_capabilities;
@@ -3844,7 +3960,19 @@ sub ipt_capabilities() {
             if $verbose or $ipt_check_capabilities;
 
         ### now find the maximum string length that is supported by iptables
-        &ipt_find_max_string_len();
+        if ($kernel_ver eq '2.4') {
+            $ipt_max_str_len = &ipt_find_max_len(
+                $ipt_max_str_len, qq|-I $TEST_CHAIN $IPT_TEST_RULE_NUM -s | .
+                    qq|$non_host -m string --string "|, qq|" -j LOG|);
+        } else {
+            $ipt_max_str_len = &ipt_find_max_len(
+                $ipt_max_str_len, qq|-I $TEST_CHAIN $IPT_TEST_RULE_NUM -s | .
+                qq|$non_host -m string --string "|, qq|" | .
+                qq|--algo $string_match_alg -j LOG|);
+        }
+
+        print "    Max supported string length: $ipt_max_str_len\n"
+            if $verbose or $ipt_check_capabilities;
 
         ### test for case insensitive string matching
         $ipt_str_test = $ipt_str_test_base;
@@ -3874,12 +4002,12 @@ sub ipt_capabilities() {
                     delete $snort_opts{'filter'}{'replace'};
                 } else {
                     $snort_opts{'unsupported'}{'replace'}
-                        = '[\s;]replace:\s*(.*?)\s*;';
+                        = qr/[\s;]replace:\s*(.*?)\s*;/;
                 }
             }
         } else {
             $snort_opts{'unsupported'}{'replace'}
-                = '[\s;]replace:\s*(.*?)\s*;';
+                = qr/[\s;]replace:\s*(.*?)\s*;/;
         }
 
         ### test to see whether '--icmp-type any' is supported
@@ -4048,89 +4176,36 @@ sub ipt_capabilities() {
     return;
 }
 
-sub ipt_find_max_string_len() {
+sub ipt_find_max_len() {
+    my ($len, $ipt_pre_pattern, $ipt_post_pattern) = @_;
 
     my $test_pattern = '';
 
     for (;;) {
 
-        $test_pattern = 'A'x$ipt_max_str_len;
-        my $test_rule_rv = 0;
+        $test_pattern = 'A'x$len;
 
-        if ($kernel_ver ne '2.4') {
-            $test_rule_rv = &ipt_rule_test("-I $TEST_CHAIN $IPT_TEST_RULE_NUM -s " .
-                qq|$non_host -m string --string "$test_pattern" | .
-                qq|--algo $string_match_alg -j LOG|);
-        } else {
-            $test_rule_rv = &ipt_rule_test("-I $TEST_CHAIN $IPT_TEST_RULE_NUM -s " .
-                qq|$non_host -m string --string "$test_pattern" -j LOG|);
-        }
+        last if &ipt_rule_test($ipt_pre_pattern
+            . $test_pattern . $ipt_post_pattern) != $IPT_SUCCESS;
 
-        last if $test_rule_rv != $IPT_SUCCESS;
+        $len += $ipt_cap_search_factor;
 
-        $ipt_max_str_len++;
-
-        last if $ipt_max_str_len == 1025; ### unlikely we'll ever get here
+        last if $len >= $ipt_max_buf_len;
     }
-    $ipt_max_str_len--;
-
-    print "    Max supported string length: $ipt_max_str_len\n"
-        if $verbose or $ipt_check_capabilities;
-
-    return;
-}
-
-sub ipt_find_max_log_prefix_len() {
-
-    my $test_pattern = '';
 
     for (;;) {
 
-        $test_pattern = 'A'x$ipt_max_log_prefix_len;
-        my $test_rule_rv = 0;
+        $test_pattern = 'A'x$len;
 
-        $test_rule_rv = &ipt_rule_test("-I $TEST_CHAIN $IPT_TEST_RULE_NUM -s " .
-            qq|$non_host -p tcp --dport 1234 -j LOG --log-prefix "$test_pattern"|);
+        last if &ipt_rule_test($ipt_pre_pattern
+            . $test_pattern . $ipt_post_pattern) == $IPT_SUCCESS;
 
-        last if $test_rule_rv != $IPT_SUCCESS;
+        $len--;
 
-        $ipt_max_log_prefix_len++;
-
-        last if $ipt_max_log_prefix_len == 1025; ### unlikely we'll ever get here
+        last if $len == 1;  ### minimum
     }
-    $ipt_max_log_prefix_len--;
 
-    print "    Max supported LOG prefix length: $ipt_max_log_prefix_len\n"
-        if $verbose or $ipt_check_capabilities;
-
-    return;
-}
-
-sub ipt_find_max_comment_len() {
-
-    my $test_comment = '';
-
-    for (;;) {
-
-        $test_comment = 'A'x$ipt_max_comment_len;
-        my $test_rule_rv = 0;
-
-        $test_rule_rv = &ipt_rule_test("-I $TEST_CHAIN $IPT_TEST_RULE_NUM -s " .
-            qq|$non_host -p tcp --dport 1234 -m comment --comment | .
-            qq|"$test_comment" -j LOG|);
-
-        last if $test_rule_rv != $IPT_SUCCESS;
-
-        $ipt_max_comment_len++;
-
-        last if $ipt_max_comment_len == 1025; ### unlikely we'll ever get here
-    }
-    $ipt_max_comment_len--;
-
-    print "    Max supported comment length: $ipt_max_comment_len\n"
-        if $verbose or $ipt_check_capabilities;
-
-    return;
+    return --$len;
 }
 
 sub ipt_find_max_multiport_supported_ports() {
@@ -4150,7 +4225,7 @@ sub ipt_find_max_multiport_supported_ports() {
 
         $ipt_multiport_max++;
 
-        last if $ipt_multiport_max == 1025; ### unlikely we'll ever get here
+        last if $ipt_multiport_max == $ipt_max_buf_len; ### unlikely we'll ever get here
     }
     $ipt_multiport_max--;
 
@@ -4230,11 +4305,6 @@ sub setup() {
     $config{'RULES_DIR'}       = $rules_dir if $rules_dir;
     $config{'QUEUE_RULES_DIR'} = $queue_rules_dir if $queue_rules_dir;
     $config{'LOG_FILE'}        = $logfile if $logfile;
-
-    if ($is_root) {
-        chdir $config{'RULES_DIR'} or
-            die "[*] Could not chdir $config{'RULES_DIR'}: $!";
-    }
 
     if ($rules_file) {
         for my $file (split /\,/, $rules_file) {
@@ -4406,7 +4476,8 @@ sub write_ipt_script() {
 
     ### make sure the script is writable first
     if (-e $config{'FWSNORT_SCRIPT'}) {
-        chmod 0755, $config{'FWSNORT_SCRIPT'} or die $!;
+        chmod 0755, $config{'FWSNORT_SCRIPT'} or
+            die "[*] Could not chmod $config{'FWSNORT_SCRIPT'}: $!";
     }
 
     open F, "> $config{'FWSNORT_SCRIPT'}" or
@@ -4414,7 +4485,8 @@ sub write_ipt_script() {
     print F "$_\n" for @ipt_script_lines;
     close F;
 
-    chmod 0500, $config{'FWSNORT_SCRIPT'} or die $!;
+    chmod 0500, $config{'FWSNORT_SCRIPT'} or
+        die "[*] Could not chmod $config{'FWSNORT_SCRIPT'}: $!";
 
     return;
 }
@@ -4538,12 +4610,30 @@ sub write_save_file() {
     my @fws_exec_lines = ();
     push @fws_exec_lines, &hdr_lines();
 
-    push @fws_exec_lines, qq|echo " "|, qq|echo "[+] Splicing fwsnort $abs_num rules | .
-        qq|into the $ipt_str policy..."|,
-        "$restore_bin < $config{'FWSNORT_SAVE_FILE'}",
-        qq|echo "    Done."\n|,
-        qq|echo " "|,
-        "exit\n";
+    push @fws_exec_lines, <<_FWSNORT_SH_;
+DO_REVERT=0
+
+while getopts r f
+do
+    case \$f in
+        r) DO_REVERT=1
+    esac
+done
+
+if [ "\$DO_REVERT" = 1 ];
+then
+    echo " "
+    echo "[+] Reverting to original iptables policy..."
+    grep -v FWSNORT $config{'FWSNORT_SAVE_FILE'} | exec $restore_bin
+else
+    echo " "
+    echo "[+] Splicing fwsnort $abs_num rules into the iptables policy..."
+    exec $restore_bin < $config{'FWSNORT_SAVE_FILE'}
+fi
+
+exit
+
+_FWSNORT_SH_
 
     ### make sure the file is writable first
     if (-e $config{'FWSNORT_SAVE_EXEC_FILE'}) {
@@ -4572,11 +4662,29 @@ sub set_non_root_values() {
     if ($fwsnort_conf eq $CONFIG_DEFAULT) {
         $fwsnort_conf = './fwsnort.conf';
     }
+
+    &set_defaults_without_ipt_test();
+    return;
+}
+
+sub set_defaults_without_ipt_test() {
+
+    $have_conntrack = 1;
     $ipt_max_str_len = 128;
     $ipt_max_comment_len = 255;
     $ipt_max_log_prefix_len = 29;
     $ipt_have_multiport_match = 1;
     $ipt_multiport_max = 15;
+
+    ### put ipopts in the unsupported list
+    if (defined $snort_opts{'filter'}{'ipopts'}) {
+        $snort_opts{'unsupported'}{'ipopts'} =
+            $snort_opts{'filter'}{'ipopts'}{'regex'};
+        delete $snort_opts{'filter'}{'ipopts'};
+    } else {
+        $snort_opts{'unsupported'}{'ipopts'} = qr/[\s;]ipopts:\s*(\w+)\s*;/;
+    }
+
     return;
 }
 
@@ -4642,8 +4750,11 @@ Options:
                                 iptables rules.
     --ipt-script=<script>     - Print iptables script to <script>
                                 instead of the default location at
-                                /etc/fwsnort/fwsnort.sh
+                                /var/lib/fwsnort/fwsnort.sh
     --ipt-apply               - Execute the fwsnort.sh script.
+    --ipt-exec                - Synonym for --ipt-apply.
+    --ipt-revert              - Revert to a version of the iptables
+                                policy without any fwsnort rules.
     --ipt-reject              - Add a protocol dependent REJECT rule
                                 (tcp resets for tcp or icmp port
                                 unreachable for udp messages) for
@@ -4747,7 +4858,7 @@ Options:
     --queue-rules-dir=<dir>   - Specify the path to the generated set of
                                 Snort rules that are to be queued to
                                 userspace in --NFQUEUE or --QUEUE mode.  The
-                                default is /etc/fwsnort/snort_rules_queue/.
+                                default is /var/lib/fwsnort/snort_rules_queue/.
     -Q   --QUEUE              - Same as the --NFQUEUE option, except use the
                                 older iptables QUEUE target.
     --string-match-alg=<alg>  - Specify the string match algorithm to use

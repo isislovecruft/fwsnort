@@ -1,3 +1,43 @@
+fwsnort-1.6.3 (12/21/2012):
+    - Bug fix to ensure that !, <, >, and = chars in content strings are
+      converted to the appropriate hex equivalents.  All content strings with
+      characters outside of [A-Za-z0-9] are now converted to hex-string format
+      in their entirety.  This should also fix an issue that results in the
+      following error when running /var/lib/fwsnort/fwsnort.sh:
+
+        Using intrapositioned negation (`--option ! this`) is deprecated in
+        favor of extrapositioned (`! --option this`).
+        Bad argument `bm'
+        Error occurred at line: 64
+        Try `iptables-restore -h' or 'iptables-restore --help' for more
+        information.
+            Done.
+
+    - Bug fix to set default max string length in --no-ipt-test mode where
+      iptables capabilities are not tested.
+    - (Andrew Merenbach) Bug fix to properly honor --exclude-regex filtering
+      option.
+    - Added fwsnort test suite to the test/ directory.  This mimics the test
+      suites from the psad and fwknop projects, and it designed to examine
+      many of the run time results of fwsnort.
+    - Added the ability to easily revert the fwsnort policy back to the
+      original iptables policy with "/var/lib/fwsnort/fwsnort.sh -r".  Note
+      that this reverts back to the policy as it was when fwsnort itself was
+      executed.
+    - Implemented a single unified function for iptables match parameter
+      length testing, and optimized to drastically reduce run time for iptables
+      capabilities checks (going from over 20 seconds to less than one second
+      in some cases).
+    - (Dwight Davis) Contributed patches for several bugs including not
+      handling --exclude-regex properly, not ignoring the deleted.rules file,
+      not handling --strict mode opertions correctly, and more.  These issues
+      and the corresponding patch were originally reported here:
+        http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=693000
+    - Bug fix for Snort rules with HOME_NET(any) -> EXTERNAL_NET(any) to
+      ensure they go into the OUTPUT chain instead of the INPUT chain.  This
+      bug was reported by Dwight Davis.
+    - Updated to bundle the latest Emerging Threats rule set.
+
 fwsnort-1.6.2 (04/28/2012):
     - Switched --no-ipt-sync to default to not syncing with the iptables policy.
       By default fwsnort attempts to match translated Snort rules to the
