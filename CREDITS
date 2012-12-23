@@ -54,6 +54,7 @@ D T
       on the fwsnort mailing list.
 
 Guillermo Gomez
+    - Fedora maintainer of fwsnort.
     - Suggested a default logging location of /var/log/fwsnort/fwsnort.log
       instead of /var/log/fwsnort.log.  The result was the addition of the
       LOG_DIR and associated variables in the fwsnort.conf file.
@@ -79,3 +80,13 @@ Kim Hagen
 Peter Vrabec
     - Suggested a new directory /var/lib/fwsnort/ for the fwsnort.sh script
       and associated files (fwsnort.save, fwsnort_iptcmd.sh, etc.).
+
+Andrew Merenbach
+    - Contributed bug fix to properly honor --exclude-regex filtering option.
+
+Dwight Davis
+    - Contributed patches for several bugs including not handling
+      --exclude-regex properly, not ignoring the deleted.rules file, not
+      handling --strict mode opertions correctly, and more.  These issues and
+      the corresponding patch were originally reported here:
+        http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=693000
