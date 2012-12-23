@@ -1,8 +1,10 @@
-fwsnort (1.6.2-2) UNRELEASED; urgency=low
+fwsnort (1.6.3-1) unstable; urgency=low
 
   * New po-debconf translation - Brazilian Portuguese (Closes: #693362)
+  * Imported Upstream version 1.6.3
+    - Closes: #693000
 
- -- Franck Joncourt <franck@debian.org>  Wed, 21 Nov 2012 21:19:14 +0100
+ -- Franck Joncourt <franck@debian.org>  Sun, 23 Dec 2012 18:14:04 +0100
 
 fwsnort (1.6.2-1) unstable; urgency=low
 
