@@ -11,7 +11,7 @@ Homepage: http://www.cipherdyne.org/fwsnort/
 
 Package: fwsnort
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, iptables, libnet-ip-perl,
+Depends: ${perl:Depends}, ${misc:Depends}, iptables, libnetaddr-ip-perl,
  libiptables-parse-perl
 Recommends: snort-rules-default
 Description: Snort-to-iptables rule translator
